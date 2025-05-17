@@ -511,10 +511,10 @@ func TestMovieDB(t *testing.T) {
 				MovieFormat: "3D",
 			},
 		}, []models.SeatMatrix{
-			{Row: 1, Column: 1, Price: 1500, SeatNumber: "A1", IsBooked: false, Type: "Platinum"},
-			{Row: 1, Column: 2, Price: 1500, SeatNumber: "A2", IsBooked: true, Type: "Platinum"},
-			{Row: 2, Column: 1, Price: 1200, SeatNumber: "B1", IsBooked: false, Type: "Gold"},
-			{Row: 2, Column: 2, Price: 1200, SeatNumber: "B2", IsBooked: true, Type: "Gold"},
+			{Row: 1, Column: 1, Price: 1500, SeatNumber: "A1", Type: "Platinum"},
+			{Row: 1, Column: 2, Price: 1500, SeatNumber: "A2", Type: "Platinum"},
+			{Row: 2, Column: 1, Price: 1200, SeatNumber: "B1", Type: "Gold"},
+			{Row: 2, Column: 2, Price: 1200, SeatNumber: "B2", Type: "Gold"},
 		})
 
 		if err != nil {
@@ -815,6 +815,6 @@ func TestMovieDB(t *testing.T) {
 
 		m.DB.Conn = conn
 
-		m.DB.Conn.AutoMigrate(&models.Movie{}, &models.CastAndCrew{}, &models.Venue{}, &models.MovieTimeSlot{}, &models.SeatMatrix{}, &models.Review{}, &models.User{})
+		m.DB.Conn.AutoMigrate(&models.Movie{}, &models.CastAndCrew{}, &models.Venue{}, &models.MovieTimeSlot{}, &models.SeatMatrix{}, &models.Review{}, &models.User{}, &models.BookedSeats{})
 	})
 }

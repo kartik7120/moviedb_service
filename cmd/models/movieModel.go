@@ -18,14 +18,24 @@ type CastAndCrew struct {
 
 type SeatMatrix struct {
 	gorm.Model
-	SeatNumber string `json:"seat_number" gorm:"not null"`
-	IsBooked   bool   `json:"is_booked"`
-	Type       string `json:"type"` // seat type (e.g., 2D, 3D, 4DX)
-	Price      int    `json:"price"`
-	Row        int    `json:"row"`
-	Column     int    `json:"column"`
-	VenueID    uint   `json:"venue_id"`
+	SeatNumber string `json:"seat_number" gorm:"not null;uniqueIndex:idx_unique_seat"`
+	Row        int    `json:"row" gorm:"not null;uniqueIndex:idx_unique_seat"`
+	Column     int    `json:"column" gorm:"not null;uniqueIndex:idx_unique_seat"`
+	Price      int    `json:"price" gorm:"not null;uniqueIndex:idx_unique_seat"`
+	VenueID    uint   `json:"venue_id" gorm:"not null;uniqueIndex:idx_unique_seat"`
+	Type       string `json:"type"`
 }
+
+// BookedSeats to track booked seats
+type BookedSeats struct {
+	gorm.Model
+	SeatNumber      string `json:"seat_number" gorm:"not null"`
+	MovieTimeSlotID uint   `json:"movie_time_slot_id"` // Link booking to a movie show
+	SeatMatrixID    uint   `json:"seat_matrix_id"`     // Reference seat matrix for consistency
+	IsBooked        bool   `json:"is_booked"`
+}
+
+// Booked Seats need to added when a time slot is added
 
 type Review struct {
 	gorm.Model
@@ -78,7 +88,7 @@ type Venue struct {
 	Address              string         `json:"address" gorm:"not null"`
 	Rows                 int            `json:"rows" gorm:"not null"`
 	Columns              int            `json:"columns" gorm:"not null"`
-	ScreenNumber         int            `json:"screen_number" gorm:"not null"`
+	ScreenNumber         int            `json:"screen_number" gorm:"not null;unique"`
 	Longitude            float64        `json:"longitude" gorm:"not null"`
 	Latitude             float64        `json:"latitude" gorm:"not null"`
 	MovieFormatSupported pq.StringArray `json:"movie_format_supported" gorm:"type:text[];not null"`

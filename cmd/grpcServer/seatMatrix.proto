@@ -1,0 +1,6 @@
+syntax = "proto3";
+
+package moviedb_service;
+
+option go_package = "github.com/kartik7120/booking_moviedb_service/cmd/grpcServer;moviedb";
+

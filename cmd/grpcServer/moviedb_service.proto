@@ -6,6 +6,35 @@ option go_package = "github.com/kartik7120/booking_moviedb_service/cmd/grpcServe
 
 import "google/protobuf/empty.proto";
 
+enum SeatType {
+    TWO_D = 0;
+    THREE_D = 1;
+    FOUR_D = 2;
+    NORMAL = 3;
+    VIP = 4;
+}
+
+message SeatMatrix {
+    string seat_number = 1;
+    bool is_booked = 2 [deprecated = true];
+    int32 price = 3;
+    int32 row = 4;
+    int32 column = 5;
+    SeatType type = 6;
+    int32 id = 7;
+}
+
+message AddSeatMatrixInput {
+    int32 venueid = 1;
+    repeated SeatMatrix seats = 2;
+}
+
+message AddSeatMatrixResponse {
+    int32 status = 1;
+    string message = 2;
+    string error = 3;
+}
+
 enum CastAndCrewType {
     ACTOR = 0;
     DIRECTOR = 1;
@@ -67,6 +96,7 @@ message Movie {
     int64 votes = 13;
     int32 ranking = 14;
     int32 id = 15;
+    reserved 12;
 }
 
 enum VenueType {
@@ -74,23 +104,6 @@ enum VenueType {
     CONCERT = 1;
     PLAY = 2;
     STANDUP = 3;
-}
-
-enum SeatType {
-    TWO_D = 0;
-    THREE_D = 1;
-    FOUR_D = 2;
-    NORMAL = 3;
-    VIP = 4;
-}
-
-message SeatMatrix {
-    string seat_number = 1;
-    bool is_booked = 2;
-    int32 price = 3;
-    int32 row = 4;
-    int32 column = 5;
-    SeatType type = 6;
 }
 
 message Venue {
@@ -268,6 +281,61 @@ message MovieTimeSlotDelete {
     int32 movie_time_slot_id = 1;
 }
 
+message GetSeatMatrixRequest {
+    int32 venueid = 1;
+}
+
+message GetSeatMatrixResponse {
+    int32 status = 1;
+    string message = 2;
+    repeated SeatMatrix seats = 3;
+    string error = 4;
+}
+
+message UpdateSeatMatrixRequest {
+    int32 venueid = 1;
+    repeated SeatMatrix seats = 2;
+}
+
+message UpdateSeatMatrixResponse {
+    int32 status = 1;
+    string message = 2;
+    string error = 3;
+}
+
+message DeleteSeatMatrixRequest {
+    int32 venueid = 1;
+    repeated SeatMatrix seats = 2 [deprecated = true];
+    int32 seat_matrix_id = 3;
+}
+
+message DeleteSeatMatrixResponse {
+    int32 status = 1;
+    string message = 2;
+    string error = 3;
+}
+
+message DeleteEntireSeatMatrixRequest {
+    int32 venueid = 1;
+}
+
+message DeleteEntireSeatMatrixResponse {
+    int32 status = 1;
+    string message = 2;
+    string error = 3;
+}
+
+message AddSingleSeatMatrixInput {
+    int32 venueid = 1;
+    SeatMatrix seat = 2;
+}
+
+message AddSingleSeatMatrixResponse {
+    int32 status = 1;
+    string message = 2;
+    string error = 3;
+}
+
 service MovieDBService {
     rpc AddMovie (Movie) returns (MovieResponse);
     rpc GetMovie (MovieRequest) returns (MovieResponse);
@@ -290,4 +358,10 @@ service MovieDBService {
     rpc AddMovieTimeSlot (MovieTimeSlot) returns (MovieTimeSlotResponse);
     rpc UpdateMovieTimeSlot (MovieTimeSlotUpdate) returns (MovieTimeSlotUpdateResponse);
     rpc DeleteMovieTimeSlot (MovieTimeSlotDelete) returns (MovieTimeSlotResponse);
+    rpc AddSeatMatrix(AddSeatMatrixInput) returns (AddSeatMatrixResponse);
+    rpc AddSingleSeatMatrix(AddSingleSeatMatrixInput) returns (AddSingleSeatMatrixResponse);
+    rpc GetSeatMatrix(GetSeatMatrixRequest) returns (GetSeatMatrixResponse);
+    rpc UpdateSeatMatrix(UpdateSeatMatrixRequest) returns (UpdateSeatMatrixResponse);
+    rpc DeleteSeatMatrix(DeleteSeatMatrixRequest) returns (DeleteSeatMatrixResponse);
+    rpc DeleteEntireSeatMatrix(DeleteEntireSeatMatrixRequest) returns (DeleteEntireSeatMatrixResponse);
 }

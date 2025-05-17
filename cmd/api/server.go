@@ -111,7 +111,6 @@ func (m *MoviedbService) AddMovie(ctx context.Context, in *moviedb.Movie) (*movi
 
 			seat := models.SeatMatrix{
 				SeatNumber: seat.SeatNumber,
-				IsBooked:   seat.IsBooked,
 				Type:       seat.Type.String(),
 				Price:      int(seat.Price),
 				Row:        int(seat.Row),
@@ -484,7 +483,6 @@ func (m *MoviedbService) AddVenue(ctx context.Context, in *moviedb.Venue) (*movi
 	for _, val := range in.Seats {
 		seat := models.SeatMatrix{
 			SeatNumber: val.SeatNumber,
-			IsBooked:   val.IsBooked,
 			Type:       val.Type.String(),
 			Price:      int(val.Price),
 			Row:        int(val.Row),
@@ -1090,6 +1088,169 @@ func (m *MoviedbService) UpdateMovieTimeSlot(ctx context.Context, in *moviedb.Mo
 	return &moviedb.MovieTimeSlotUpdateResponse{
 		Status:  200,
 		Message: "movie time slot updated successfully",
+		Error:   "",
+	}, nil
+}
+
+func (m *MoviedbService) GetSeatMatrix(ctx context.Context, in *moviedb.GetSeatMatrixRequest) (*moviedb.GetSeatMatrixResponse, error) {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	seatMatrix, status, err := m.MovieDB.GetSeatMatrix(int(in.Venueid))
+
+	if status != 200 || err != nil {
+		return &moviedb.GetSeatMatrixResponse{
+			Status:  int32(status),
+			Message: "error getting seat matrix",
+			Error:   err.Error(),
+		}, nil
+	}
+
+	var seats []*moviedb.SeatMatrix
+
+	for _, v := range seatMatrix {
+		seat := &moviedb.SeatMatrix{
+			SeatNumber: v.SeatNumber,
+			Type:       moviedb.SeatType(moviedb.SeatType_value[v.Type]),
+			Price:      int32(v.Price),
+			Row:        int32(v.Row),
+			Column:     int32(v.Column),
+			Id:         int32(v.ID),
+		}
+
+		seats = append(seats, seat)
+	}
+
+	return &moviedb.GetSeatMatrixResponse{
+		Status:  200,
+		Message: "success",
+		Seats:   seats,
+		Error:   "",
+	}, nil
+}
+
+func (m *MoviedbService) AddSeatMatrix(ctx context.Context, in *moviedb.AddSeatMatrixInput) (*moviedb.AddSeatMatrixResponse, error) {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	var seats []models.SeatMatrix
+
+	for _, v := range in.Seats {
+
+		seat := models.SeatMatrix{
+			SeatNumber: v.SeatNumber,
+			Type:       v.Type.String(),
+			Price:      int(v.Price),
+			Row:        int(v.Row),
+			Column:     int(v.Column),
+			VenueID:    uint(in.Venueid),
+		}
+
+		seats = append(seats, seat)
+	}
+
+	status, err := m.MovieDB.AddSeatMatrix(int(in.Venueid), seats)
+
+	if status != 200 || err != nil {
+		return &moviedb.AddSeatMatrixResponse{
+			Status:  int32(status),
+			Message: "error adding seat matrix",
+			Error:   err.Error(),
+		}, nil
+	}
+
+	return &moviedb.AddSeatMatrixResponse{
+		Status:  200,
+		Message: "seat matrix added successfully",
+		Error:   "",
+	}, nil
+}
+
+func (m *MoviedbService) UpdateSeatMatrix(ctx context.Context, in *moviedb.UpdateSeatMatrixRequest) (*moviedb.UpdateSeatMatrixResponse, error) {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	var seats []models.SeatMatrix
+
+	for _, v := range in.Seats {
+		seat := models.SeatMatrix{
+			SeatNumber: v.SeatNumber,
+			Type:       v.Type.String(),
+			Price:      int(v.Price),
+			Row:        int(v.Row),
+			Column:     int(v.Column),
+			VenueID:    uint(in.Venueid),
+		}
+
+		seats = append(seats, seat)
+	}
+
+	for _, v := range in.Seats {
+		seat := models.SeatMatrix{
+			SeatNumber: v.SeatNumber,
+			Type:       v.Type.String(),
+			Price:      int(v.Price),
+			Row:        int(v.Row),
+			Column:     int(v.Column),
+			VenueID:    uint(in.Venueid),
+		}
+
+		_, status, err := m.MovieDB.UpdateSeatMatrix(uint(v.Id), seat)
+
+		if status != 200 || err != nil {
+			return &moviedb.UpdateSeatMatrixResponse{
+				Status:  int32(status),
+				Message: "error updating seat matrix",
+				Error:   err.Error(),
+			}, nil
+		}
+	}
+
+	return &moviedb.UpdateSeatMatrixResponse{
+		Status:  200,
+		Message: "seat matrix updated successfully",
+		Error:   "",
+	}, nil
+}
+
+func (m *MoviedbService) DeleteSeatMatrix(ctx context.Context, in *moviedb.DeleteSeatMatrixRequest) (*moviedb.DeleteSeatMatrixResponse, error) {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	status, err := m.MovieDB.DeleteSeatMatrix(uint(in.SeatMatrixId))
+
+	if status != 200 || err != nil {
+		return &moviedb.DeleteSeatMatrixResponse{
+			Status:  int32(status),
+			Message: "error deleting seat matrix",
+			Error:   err.Error(),
+		}, nil
+	}
+
+	return &moviedb.DeleteSeatMatrixResponse{
+		Status:  200,
+		Message: "seat matrix deleted successfully",
+		Error:   "",
+	}, nil
+}
+
+func (m *MoviedbService) DeleteEntireSeatMatrix(ctx context.Context, in *moviedb.DeleteEntireSeatMatrixRequest) (*moviedb.DeleteEntireSeatMatrixResponse, error) {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	status, err := m.MovieDB.DeleteEntireSeatMatrix(uint(in.Venueid))
+
+	if status != 200 || err != nil {
+		return &moviedb.DeleteEntireSeatMatrixResponse{
+			Status:  int32(status),
+			Message: "error deleting entire seat matrix",
+			Error:   err.Error(),
+		}, nil
+	}
+
+	return &moviedb.DeleteEntireSeatMatrixResponse{
+		Status:  200,
+		Message: "entire seat matrix deleted successfully",
 		Error:   "",
 	}, nil
 }

@@ -601,3 +601,121 @@ func (m *MovieDB) AddMovieTimeSlot(movieTimeSlot models.MovieTimeSlot) (models.M
 
 	return movieTimeSlot, 200, nil
 }
+
+func (m *MovieDB) AddSeatMatrix(venueID int, seatMatrix []models.SeatMatrix) (int, error) {
+
+	for i := range seatMatrix {
+		err := validate.Struct(seatMatrix[i])
+
+		if err != nil {
+			return 400, err
+		}
+	}
+
+	for i := range seatMatrix {
+		seatMatrix[i].VenueID = uint(venueID)
+	}
+
+	for _, v := range seatMatrix {
+		var existingSeatMatrix models.SeatMatrix
+		m.DB.Conn.Where("row = ? AND column = ? AND venue_id = ?", v.SeatNumber, v.Row, v.Column, v.VenueID).First(&existingSeatMatrix)
+
+		if existingSeatMatrix.ID != 0 {
+			return 400, errors.New("seat with same row and column already exists")
+		}
+	}
+
+	result := m.DB.Conn.Create(&seatMatrix)
+
+	if result.Error != nil && result.Error.Error() == "ERROR: duplicate key value violates unique constraint \"idx_unique_seat\" (SQLSTATE 23505)" {
+		return 400, errors.New("duplicate seat number found")
+	}
+
+	if result.Error != nil {
+		return 500, result.Error
+	}
+
+	return 200, nil
+}
+
+func (m *MovieDB) GetSeatMatrix(venueID int) ([]models.SeatMatrix, int, error) {
+	var seatMatrix []models.SeatMatrix
+	result := m.DB.Conn.Where("venue_id = ?", venueID).Find(&seatMatrix)
+
+	if result.Error != nil {
+		return nil, 500, result.Error
+	}
+
+	return seatMatrix, 200, nil
+}
+
+func (m *MovieDB) UpdateSeatMatrix(seatMatrixID uint, updatedSeatMatrix models.SeatMatrix) (models.SeatMatrix, int, error) {
+
+	// Use a transaction to ensure atomicity
+
+	tx := m.DB.Conn.Begin()
+
+	if tx.Error != nil {
+		return updatedSeatMatrix, 500, tx.Error
+	}
+
+	// Ensure rollback on panic
+
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	result := tx.First(&models.SeatMatrix{}, seatMatrixID)
+
+	if result.Error != nil {
+		tx.Rollback()
+		return updatedSeatMatrix, 500, result.Error
+	}
+
+	result = tx.Model(&models.SeatMatrix{}).Where("id = ?", seatMatrixID).Updates(&updatedSeatMatrix)
+
+	if result.Error != nil {
+		tx.Rollback()
+		return updatedSeatMatrix, 500, result.Error
+	}
+
+	// Commit the transaction
+
+	if err := tx.Commit().Error; err != nil {
+		return updatedSeatMatrix, 500, fmt.Errorf("commit error: %v", err)
+	}
+
+	return updatedSeatMatrix, 200, nil
+}
+
+func (m *MovieDB) DeleteSeatMatrix(seatMatrixID uint) (int, error) {
+	var seatMatrix models.SeatMatrix
+
+	result := m.DB.Conn.Unscoped().Where("id = ?", seatMatrixID).First(&seatMatrix)
+
+	if result.Error != nil {
+		return 500, result.Error
+	}
+
+	result = m.DB.Conn.Unscoped().Delete(&models.SeatMatrix{}, seatMatrixID)
+
+	if result.Error != nil {
+		return 500, result.Error
+	}
+
+	return 200, nil
+}
+
+func (m *MovieDB) DeleteEntireSeatMatrix(venueID uint) (int, error) {
+	var seatMatrix []models.SeatMatrix
+
+	result := m.DB.Conn.Unscoped().Where("venue_id = ?", venueID).Delete(&seatMatrix)
+
+	if result.Error != nil {
+		return 500, result.Error
+	}
+
+	return 200, nil
+}
