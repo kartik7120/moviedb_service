@@ -3,12 +3,14 @@ package api
 import (
 	"errors"
 	"fmt"
+	"net/mail"
 	"time"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/kartik7120/booking_moviedb_service/cmd/helper"
 	"github.com/kartik7120/booking_moviedb_service/cmd/models"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type MovieDB struct {
@@ -599,6 +601,38 @@ func (m *MovieDB) AddMovieTimeSlot(movieTimeSlot models.MovieTimeSlot) (models.M
 		return movieTimeSlot, 500, result.Error
 	}
 
+	// When a time slot is created, take the venue ID and fetch it's seat matrix and then add booked seats with corresponding seat matrix ID and movie slot ID
+
+	var seatMatrix []models.SeatMatrix
+
+	result = m.DB.Conn.Where("venue_id = ?", movieTimeSlot.VenueID).Find(&seatMatrix)
+
+	var bookedSeats []models.BookedSeats
+
+	for _, seat := range seatMatrix {
+		bookedSeat := models.BookedSeats{
+			SeatNumber:      seat.SeatNumber,
+			MovieTimeSlotID: movieTimeSlot.ID,
+			SeatMatrixID:    seat.ID,
+			IsBooked:        false,
+		}
+		bookedSeats = append(bookedSeats, bookedSeat)
+	}
+
+	result = m.DB.Conn.Create(&bookedSeats)
+
+	if result.Error != nil && result.Error.Error() == "ERROR: duplicate key value violates unique constraint \"idx_unique_seat\" (SQLSTATE 23505)" {
+		return movieTimeSlot, 400, errors.New("ERROR: duplicate key value violates unique constraint \"idx_unique_seat\" (SQLSTATE 23505)")
+	}
+
+	if result.Error != nil && result.Error.Error() == "ERROR: duplicate key value violates unique constraint \"uni_seat_matrices_seat_number\" (SQLSTATE 23505)" {
+		return movieTimeSlot, 400, errors.New("duplicate seat number found")
+	}
+
+	if result.Error != nil {
+		return movieTimeSlot, 500, result.Error
+	}
+
 	return movieTimeSlot, 200, nil
 }
 
@@ -628,6 +662,10 @@ func (m *MovieDB) AddSeatMatrix(venueID int, seatMatrix []models.SeatMatrix) (in
 	result := m.DB.Conn.Create(&seatMatrix)
 
 	if result.Error != nil && result.Error.Error() == "ERROR: duplicate key value violates unique constraint \"idx_unique_seat\" (SQLSTATE 23505)" {
+		return 400, errors.New("ERROR: duplicate key value violates unique constraint \"idx_unique_seat\" (SQLSTATE 23505)")
+	}
+
+	if result.Error != nil && result.Error.Error() == "ERROR: duplicate key value violates unique constraint \"uni_seat_matrices_seat_number\" (SQLSTATE 23505)" {
 		return 400, errors.New("duplicate seat number found")
 	}
 
@@ -718,4 +756,191 @@ func (m *MovieDB) DeleteEntireSeatMatrix(venueID uint) (int, error) {
 	}
 
 	return 200, nil
+}
+
+func (m *MovieDB) BookSeats(movieTimeSlotID int32, email string, phoneNumber string, seatToBeBooked []models.BookedSeats) (int, error) {
+
+	tx := m.DB.Conn.Begin()
+	if tx.Error != nil {
+		return 500, tx.Error
+	}
+
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// Check if the movie time slot exists
+	var existingMovieTimeSlot models.MovieTimeSlot
+	if err := tx.Where("id = ?", movieTimeSlotID).First(&existingMovieTimeSlot).Error; err != nil {
+		tx.Rollback()
+		return 500, err
+	}
+
+	// Check and lock each seat
+	for _, seat := range seatToBeBooked {
+		var existingSeat models.BookedSeats
+
+		err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).
+			Where("seat_matrix_id = ? AND movie_time_slot_id = ?", seat.SeatMatrixID, movieTimeSlotID).
+			First(&existingSeat).Error
+
+		if err != nil {
+			tx.Rollback()
+			return 500, err
+		}
+
+		if existingSeat.IsBooked {
+			tx.Rollback()
+			return 400, fmt.Errorf("seat %s already booked", existingSeat.SeatNumber)
+		}
+
+		// If seat has already phone number and email filled then it cannot be booked again.
+
+		if existingSeat.PhoneNumber != "" || existingSeat.Email != nil {
+			tx.Rollback()
+			return 400, fmt.Errorf("seat %s already booked", existingSeat.SeatNumber)
+		}
+
+		// check if phone number is valid, can be with or without country code.
+
+		if len(fmt.Sprint(phoneNumber)) < 10 {
+			tx.Rollback()
+			return 400, fmt.Errorf("invalid phone number")
+		}
+
+		if len(fmt.Sprint(phoneNumber)) > 15 {
+			tx.Rollback()
+			return 400, fmt.Errorf("invalid phone number")
+		}
+
+		// check if email is valid
+
+		m, err := mail.ParseAddress(email)
+
+		if err != nil {
+			tx.Rollback()
+			return 400, err
+		}
+
+		existingSeat.PhoneNumber = phoneNumber
+		existingSeat.Email = &m.Address
+
+		// Update booking
+		if err := tx.Model(&existingSeat).Updates(existingSeat).Error; err != nil {
+			tx.Rollback()
+			return 500, err
+		}
+	}
+
+	// Commit transaction
+	if err := tx.Commit().Error; err != nil {
+		return 500, fmt.Errorf("commit error: %v", err)
+	}
+
+	return 200, nil
+}
+
+func (m *MovieDB) GetBookedSeats(movieTimeSlotID uint) ([]models.BookedSeats, int, error) {
+
+	var bookedSeats []models.BookedSeats
+
+	result := m.DB.Conn.Model(models.BookedSeats{}).Where("movie_time_slot_id = ?", movieTimeSlotID).Find(&bookedSeats)
+
+	if result.Error != nil {
+		return nil, 500, result.Error
+	}
+
+	return bookedSeats, 200, nil
+}
+
+func (m *MovieDB) IsValidToCommitSeatsForBooking(movie_time_slot_id int, seatMatrixIds []int32) (bool, []struct {
+	ID         int32
+	SeatNumber string
+	Price      int32
+	MovieName  string
+}, error) {
+
+	// Need to check if the seats in the seatMatrix for a particular venue and a particular time slots can be booked or not
+
+	// If it cannot be booked then return false otherwise we return true
+
+	var movieTimeSlot models.MovieTimeSlot
+
+	result := m.DB.Conn.Model(&models.MovieTimeSlot{}).Where("id = ?", movie_time_slot_id).Find(&movieTimeSlot)
+
+	if result.Error != nil {
+		return false, nil, result.Error
+	}
+
+	if movieTimeSlot.ID == 0 {
+		return false, nil, errors.New("Movie time slot does not exists")
+	}
+
+	var movie models.Movie
+
+	result = m.DB.Conn.Model(&models.Movie{}).Where("id = ?", movieTimeSlot.MovieID).Find(&movie)
+
+	if result.Error != nil {
+		return false, nil, result.Error
+	}
+
+	if movie.ID == 0 {
+		return false, nil, errors.New("Movie does not exists")
+	}
+
+	// Find the seatMatrix to which this movie time slot belongs
+
+	// var toBeBookedSeats []models.BookedSeats
+
+	var toBeBookedSeats2 []struct {
+		ID         int32
+		SeatNumber string
+		Price      int32
+		MovieName  string
+	}
+
+	for _, v := range seatMatrixIds {
+
+		var bookedSeat models.BookedSeats
+
+		var seatMatrix models.SeatMatrix
+
+		result := m.DB.Conn.Model(&models.BookedSeats{}).Where("movie_time_slot_id = ? AND seat_matrix_id = ?", movie_time_slot_id, v).Find(&bookedSeat)
+
+		if result.Error != nil {
+			return false, nil, result.Error
+		}
+
+		// Get the price of the seat
+
+		result = m.DB.Conn.Model(&models.SeatMatrix{}).Where("id = ?", bookedSeat.SeatMatrixID).Find(&seatMatrix)
+
+		if result.Error != nil {
+			return false, nil, result.Error
+		}
+
+		if bookedSeat.IsBooked == true {
+			return false, nil, errors.New("Seat is already booked")
+		}
+
+		if bookedSeat.ID == 0 {
+			return false, nil, errors.New("seat does not exist")
+		}
+
+		toBeBookedSeats2 = append(toBeBookedSeats2, struct {
+			ID         int32
+			SeatNumber string
+			Price      int32
+			MovieName  string
+		}{
+			ID:         int32(bookedSeat.ID),
+			SeatNumber: bookedSeat.SeatNumber,
+			Price:      int32(seatMatrix.Price),
+			MovieName:  movie.Title,
+		})
+	}
+
+	return true, toBeBookedSeats2, nil
 }

@@ -20,33 +20,36 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	MovieDBService_AddMovie_FullMethodName               = "/moviedb_service.MovieDBService/AddMovie"
-	MovieDBService_GetMovie_FullMethodName               = "/moviedb_service.MovieDBService/GetMovie"
-	MovieDBService_GetAllMovies_FullMethodName           = "/moviedb_service.MovieDBService/GetAllMovies"
-	MovieDBService_UpdateMovie_FullMethodName            = "/moviedb_service.MovieDBService/UpdateMovie"
-	MovieDBService_DeleteMovie_FullMethodName            = "/moviedb_service.MovieDBService/DeleteMovie"
-	MovieDBService_AddVenue_FullMethodName               = "/moviedb_service.MovieDBService/AddVenue"
-	MovieDBService_GetVenue_FullMethodName               = "/moviedb_service.MovieDBService/GetVenue"
-	MovieDBService_GetAllVenues_FullMethodName           = "/moviedb_service.MovieDBService/GetAllVenues"
-	MovieDBService_UpdateVenue_FullMethodName            = "/moviedb_service.MovieDBService/UpdateVenue"
-	MovieDBService_DeleteVenue_FullMethodName            = "/moviedb_service.MovieDBService/DeleteVenue"
-	MovieDBService_GetUpcomingMovies_FullMethodName      = "/moviedb_service.MovieDBService/GetUpcomingMovies"
-	MovieDBService_GetNowPlayingMovies_FullMethodName    = "/moviedb_service.MovieDBService/GetNowPlayingMovies"
-	MovieDBService_AddReview_FullMethodName              = "/moviedb_service.MovieDBService/AddReview"
-	MovieDBService_GetReview_FullMethodName              = "/moviedb_service.MovieDBService/GetReview"
-	MovieDBService_UpdateReview_FullMethodName           = "/moviedb_service.MovieDBService/UpdateReview"
-	MovieDBService_DeleteReview_FullMethodName           = "/moviedb_service.MovieDBService/DeleteReview"
-	MovieDBService_GetAllMovieReviews_FullMethodName     = "/moviedb_service.MovieDBService/GetAllMovieReviews"
-	MovieDBService_GetMovieTimeSlots_FullMethodName      = "/moviedb_service.MovieDBService/GetMovieTimeSlots"
-	MovieDBService_AddMovieTimeSlot_FullMethodName       = "/moviedb_service.MovieDBService/AddMovieTimeSlot"
-	MovieDBService_UpdateMovieTimeSlot_FullMethodName    = "/moviedb_service.MovieDBService/UpdateMovieTimeSlot"
-	MovieDBService_DeleteMovieTimeSlot_FullMethodName    = "/moviedb_service.MovieDBService/DeleteMovieTimeSlot"
-	MovieDBService_AddSeatMatrix_FullMethodName          = "/moviedb_service.MovieDBService/AddSeatMatrix"
-	MovieDBService_AddSingleSeatMatrix_FullMethodName    = "/moviedb_service.MovieDBService/AddSingleSeatMatrix"
-	MovieDBService_GetSeatMatrix_FullMethodName          = "/moviedb_service.MovieDBService/GetSeatMatrix"
-	MovieDBService_UpdateSeatMatrix_FullMethodName       = "/moviedb_service.MovieDBService/UpdateSeatMatrix"
-	MovieDBService_DeleteSeatMatrix_FullMethodName       = "/moviedb_service.MovieDBService/DeleteSeatMatrix"
-	MovieDBService_DeleteEntireSeatMatrix_FullMethodName = "/moviedb_service.MovieDBService/DeleteEntireSeatMatrix"
+	MovieDBService_AddMovie_FullMethodName                       = "/moviedb_service.MovieDBService/AddMovie"
+	MovieDBService_GetMovie_FullMethodName                       = "/moviedb_service.MovieDBService/GetMovie"
+	MovieDBService_GetAllMovies_FullMethodName                   = "/moviedb_service.MovieDBService/GetAllMovies"
+	MovieDBService_UpdateMovie_FullMethodName                    = "/moviedb_service.MovieDBService/UpdateMovie"
+	MovieDBService_DeleteMovie_FullMethodName                    = "/moviedb_service.MovieDBService/DeleteMovie"
+	MovieDBService_AddVenue_FullMethodName                       = "/moviedb_service.MovieDBService/AddVenue"
+	MovieDBService_GetVenue_FullMethodName                       = "/moviedb_service.MovieDBService/GetVenue"
+	MovieDBService_GetAllVenues_FullMethodName                   = "/moviedb_service.MovieDBService/GetAllVenues"
+	MovieDBService_UpdateVenue_FullMethodName                    = "/moviedb_service.MovieDBService/UpdateVenue"
+	MovieDBService_DeleteVenue_FullMethodName                    = "/moviedb_service.MovieDBService/DeleteVenue"
+	MovieDBService_GetUpcomingMovies_FullMethodName              = "/moviedb_service.MovieDBService/GetUpcomingMovies"
+	MovieDBService_GetNowPlayingMovies_FullMethodName            = "/moviedb_service.MovieDBService/GetNowPlayingMovies"
+	MovieDBService_AddReview_FullMethodName                      = "/moviedb_service.MovieDBService/AddReview"
+	MovieDBService_GetReview_FullMethodName                      = "/moviedb_service.MovieDBService/GetReview"
+	MovieDBService_UpdateReview_FullMethodName                   = "/moviedb_service.MovieDBService/UpdateReview"
+	MovieDBService_DeleteReview_FullMethodName                   = "/moviedb_service.MovieDBService/DeleteReview"
+	MovieDBService_GetAllMovieReviews_FullMethodName             = "/moviedb_service.MovieDBService/GetAllMovieReviews"
+	MovieDBService_GetMovieTimeSlots_FullMethodName              = "/moviedb_service.MovieDBService/GetMovieTimeSlots"
+	MovieDBService_AddMovieTimeSlot_FullMethodName               = "/moviedb_service.MovieDBService/AddMovieTimeSlot"
+	MovieDBService_UpdateMovieTimeSlot_FullMethodName            = "/moviedb_service.MovieDBService/UpdateMovieTimeSlot"
+	MovieDBService_DeleteMovieTimeSlot_FullMethodName            = "/moviedb_service.MovieDBService/DeleteMovieTimeSlot"
+	MovieDBService_AddSeatMatrix_FullMethodName                  = "/moviedb_service.MovieDBService/AddSeatMatrix"
+	MovieDBService_AddSingleSeatMatrix_FullMethodName            = "/moviedb_service.MovieDBService/AddSingleSeatMatrix"
+	MovieDBService_GetSeatMatrix_FullMethodName                  = "/moviedb_service.MovieDBService/GetSeatMatrix"
+	MovieDBService_UpdateSeatMatrix_FullMethodName               = "/moviedb_service.MovieDBService/UpdateSeatMatrix"
+	MovieDBService_DeleteSeatMatrix_FullMethodName               = "/moviedb_service.MovieDBService/DeleteSeatMatrix"
+	MovieDBService_DeleteEntireSeatMatrix_FullMethodName         = "/moviedb_service.MovieDBService/DeleteEntireSeatMatrix"
+	MovieDBService_BookSeats_FullMethodName                      = "/moviedb_service.MovieDBService/BookSeats"
+	MovieDBService_GetBookedSeats_FullMethodName                 = "/moviedb_service.MovieDBService/GetBookedSeats"
+	MovieDBService_IsValidToCommitSeatsForBooking_FullMethodName = "/moviedb_service.MovieDBService/IsValidToCommitSeatsForBooking"
 )
 
 // MovieDBServiceClient is the client API for MovieDBService service.
@@ -80,6 +83,10 @@ type MovieDBServiceClient interface {
 	UpdateSeatMatrix(ctx context.Context, in *UpdateSeatMatrixRequest, opts ...grpc.CallOption) (*UpdateSeatMatrixResponse, error)
 	DeleteSeatMatrix(ctx context.Context, in *DeleteSeatMatrixRequest, opts ...grpc.CallOption) (*DeleteSeatMatrixResponse, error)
 	DeleteEntireSeatMatrix(ctx context.Context, in *DeleteEntireSeatMatrixRequest, opts ...grpc.CallOption) (*DeleteEntireSeatMatrixResponse, error)
+	BookSeats(ctx context.Context, in *BookSeatsRequest, opts ...grpc.CallOption) (*BookSeatsResponse, error)
+	GetBookedSeats(ctx context.Context, in *GetBookedSeatsRequest, opts ...grpc.CallOption) (*GetBookedSeatsResponse, error)
+	// rpc GetBookedSeatsDetails(GetBookedSeatsDetailsRequest) returns (GetBookedSeatsDetailsResponse);
+	IsValidToCommitSeatsForBooking(ctx context.Context, in *IsValidToCommitSeatsForBooking_Request, opts ...grpc.CallOption) (*IsValidToCommitSeatsForBooking_Response, error)
 }
 
 type movieDBServiceClient struct {
@@ -360,6 +367,36 @@ func (c *movieDBServiceClient) DeleteEntireSeatMatrix(ctx context.Context, in *D
 	return out, nil
 }
 
+func (c *movieDBServiceClient) BookSeats(ctx context.Context, in *BookSeatsRequest, opts ...grpc.CallOption) (*BookSeatsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BookSeatsResponse)
+	err := c.cc.Invoke(ctx, MovieDBService_BookSeats_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *movieDBServiceClient) GetBookedSeats(ctx context.Context, in *GetBookedSeatsRequest, opts ...grpc.CallOption) (*GetBookedSeatsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetBookedSeatsResponse)
+	err := c.cc.Invoke(ctx, MovieDBService_GetBookedSeats_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *movieDBServiceClient) IsValidToCommitSeatsForBooking(ctx context.Context, in *IsValidToCommitSeatsForBooking_Request, opts ...grpc.CallOption) (*IsValidToCommitSeatsForBooking_Response, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(IsValidToCommitSeatsForBooking_Response)
+	err := c.cc.Invoke(ctx, MovieDBService_IsValidToCommitSeatsForBooking_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MovieDBServiceServer is the server API for MovieDBService service.
 // All implementations must embed UnimplementedMovieDBServiceServer
 // for forward compatibility.
@@ -391,6 +428,10 @@ type MovieDBServiceServer interface {
 	UpdateSeatMatrix(context.Context, *UpdateSeatMatrixRequest) (*UpdateSeatMatrixResponse, error)
 	DeleteSeatMatrix(context.Context, *DeleteSeatMatrixRequest) (*DeleteSeatMatrixResponse, error)
 	DeleteEntireSeatMatrix(context.Context, *DeleteEntireSeatMatrixRequest) (*DeleteEntireSeatMatrixResponse, error)
+	BookSeats(context.Context, *BookSeatsRequest) (*BookSeatsResponse, error)
+	GetBookedSeats(context.Context, *GetBookedSeatsRequest) (*GetBookedSeatsResponse, error)
+	// rpc GetBookedSeatsDetails(GetBookedSeatsDetailsRequest) returns (GetBookedSeatsDetailsResponse);
+	IsValidToCommitSeatsForBooking(context.Context, *IsValidToCommitSeatsForBooking_Request) (*IsValidToCommitSeatsForBooking_Response, error)
 	mustEmbedUnimplementedMovieDBServiceServer()
 }
 
@@ -481,6 +522,15 @@ func (UnimplementedMovieDBServiceServer) DeleteSeatMatrix(context.Context, *Dele
 }
 func (UnimplementedMovieDBServiceServer) DeleteEntireSeatMatrix(context.Context, *DeleteEntireSeatMatrixRequest) (*DeleteEntireSeatMatrixResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteEntireSeatMatrix not implemented")
+}
+func (UnimplementedMovieDBServiceServer) BookSeats(context.Context, *BookSeatsRequest) (*BookSeatsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method BookSeats not implemented")
+}
+func (UnimplementedMovieDBServiceServer) GetBookedSeats(context.Context, *GetBookedSeatsRequest) (*GetBookedSeatsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetBookedSeats not implemented")
+}
+func (UnimplementedMovieDBServiceServer) IsValidToCommitSeatsForBooking(context.Context, *IsValidToCommitSeatsForBooking_Request) (*IsValidToCommitSeatsForBooking_Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method IsValidToCommitSeatsForBooking not implemented")
 }
 func (UnimplementedMovieDBServiceServer) mustEmbedUnimplementedMovieDBServiceServer() {}
 func (UnimplementedMovieDBServiceServer) testEmbeddedByValue()                        {}
@@ -989,6 +1039,60 @@ func _MovieDBService_DeleteEntireSeatMatrix_Handler(srv interface{}, ctx context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MovieDBService_BookSeats_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BookSeatsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MovieDBServiceServer).BookSeats(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MovieDBService_BookSeats_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MovieDBServiceServer).BookSeats(ctx, req.(*BookSeatsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MovieDBService_GetBookedSeats_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBookedSeatsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MovieDBServiceServer).GetBookedSeats(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MovieDBService_GetBookedSeats_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MovieDBServiceServer).GetBookedSeats(ctx, req.(*GetBookedSeatsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MovieDBService_IsValidToCommitSeatsForBooking_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IsValidToCommitSeatsForBooking_Request)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MovieDBServiceServer).IsValidToCommitSeatsForBooking(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MovieDBService_IsValidToCommitSeatsForBooking_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MovieDBServiceServer).IsValidToCommitSeatsForBooking(ctx, req.(*IsValidToCommitSeatsForBooking_Request))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // MovieDBService_ServiceDesc is the grpc.ServiceDesc for MovieDBService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1103,6 +1207,18 @@ var MovieDBService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteEntireSeatMatrix",
 			Handler:    _MovieDBService_DeleteEntireSeatMatrix_Handler,
+		},
+		{
+			MethodName: "BookSeats",
+			Handler:    _MovieDBService_BookSeats_Handler,
+		},
+		{
+			MethodName: "GetBookedSeats",
+			Handler:    _MovieDBService_GetBookedSeats_Handler,
+		},
+		{
+			MethodName: "IsValidToCommitSeatsForBooking",
+			Handler:    _MovieDBService_IsValidToCommitSeatsForBooking_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -336,6 +336,70 @@ message AddSingleSeatMatrixResponse {
     string error = 3;
 }
 
+message BookedSeats {
+    int32 id = 1;
+    string seat_number = 2;
+    int32 movieTimeSlotID = 3;
+    int32 seatMatrixID = 4;
+    bool is_booked = 5;
+    reserved 6;
+    reserved 7;
+    int32 price = 8;
+    string movieName = 9;
+}
+
+message BookSeatsRequest {
+    MovieTimeSlot movie_time_slot = 1 [deprecated = true];
+    repeated BookedSeats seats = 2;
+    int32 movie_time_slot_id = 3;
+    reserved 4;
+    string email = 5;
+    // int64 phone_number = 6;
+    reserved 6;
+    string phone_number = 7;
+}
+
+message BookSeatsResponse {
+    int32 status = 1;
+    string message = 2;
+    repeated int32 book_seats_id = 3;
+    string error = 4;
+}
+
+message GetBookedSeatsRequest {
+    int32 movie_time_slot_id = 1;
+}
+
+message GetBookedSeatsResponse {
+    int32 status = 1;
+    string message = 2;
+    repeated BookedSeats booked_seats = 3;
+    string error = 4;
+}
+
+message GetBookedSeatsDetailsRequest {
+    repeated int32 booked_seats_ids = 1;
+}
+
+message GetBookedSeatsDetailsResponse {
+    int32 status = 1;
+    string message = 2;
+    repeated BookedSeats booked_seats = 3;
+    string error = 4;
+}
+
+message IsValidToCommitSeatsForBooking_Request {
+    int32 movie_time_slot_id = 1;
+    repeated int32 seatMatrixIds = 2;
+}
+
+message IsValidToCommitSeatsForBooking_Response {
+    bool isvalid = 1;
+    string error = 2;
+    int32 status = 3;
+    repeated BookedSeats toBeBookedSeats = 4;
+}
+
 service MovieDBService {
     rpc AddMovie (Movie) returns (MovieResponse);
     rpc GetMovie (MovieRequest) returns (MovieResponse);
@@ -364,4 +428,8 @@ service MovieDBService {
     rpc UpdateSeatMatrix(UpdateSeatMatrixRequest) returns (UpdateSeatMatrixResponse);
     rpc DeleteSeatMatrix(DeleteSeatMatrixRequest) returns (DeleteSeatMatrixResponse);
     rpc DeleteEntireSeatMatrix(DeleteEntireSeatMatrixRequest) returns (DeleteEntireSeatMatrixResponse);
+    rpc BookSeats(BookSeatsRequest) returns (BookSeatsResponse);
+    rpc GetBookedSeats(GetBookedSeatsRequest) returns (GetBookedSeatsResponse);
+    // rpc GetBookedSeatsDetails(GetBookedSeatsDetailsRequest) returns (GetBookedSeatsDetailsResponse);
+    rpc IsValidToCommitSeatsForBooking(IsValidToCommitSeatsForBooking_Request) returns (IsValidToCommitSeatsForBooking_Response);
 }

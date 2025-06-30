@@ -1254,3 +1254,138 @@ func (m *MoviedbService) DeleteEntireSeatMatrix(ctx context.Context, in *moviedb
 		Error:   "",
 	}, nil
 }
+
+func (m *MoviedbService) BookSeats(ctx context.Context, in *moviedb.BookSeatsRequest) (*moviedb.BookSeatsResponse, error) {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	seats := make([]models.BookedSeats, 0)
+
+	for _, val := range in.Seats {
+		seat := models.BookedSeats{
+			SeatNumber:      val.SeatNumber,
+			MovieTimeSlotID: uint(val.MovieTimeSlotID),
+			SeatMatrixID:    uint(val.SeatMatrixID),
+			IsBooked:        true,
+		}
+		seats = append(seats, seat)
+	}
+
+	status, err := m.MovieDB.BookSeats(in.MovieTimeSlotId, in.Email, in.PhoneNumber, seats)
+
+	if status != 200 || err != nil {
+		return &moviedb.BookSeatsResponse{
+			Status:  int32(status),
+			Message: "error booking seats",
+			Error:   err.Error(),
+		}, nil
+	}
+
+	return &moviedb.BookSeatsResponse{
+		Status:  200,
+		Message: "seats booked successfully",
+		Error:   "",
+	}, nil
+}
+
+func (m *MoviedbService) GetBookedSeats(ctx context.Context, in *moviedb.GetBookedSeatsRequest) (*moviedb.GetBookedSeatsResponse, error) {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	bookedSeats, status, err := m.MovieDB.GetBookedSeats(uint(in.MovieTimeSlotId))
+
+	if status != 200 || err != nil {
+		return &moviedb.GetBookedSeatsResponse{
+			Status:  int32(status),
+			Message: "error getting booked seats",
+			Error:   err.Error(),
+		}, nil
+	}
+
+	seats := make([]*moviedb.BookedSeats, 0)
+
+	for _, val := range bookedSeats {
+
+		seat := &moviedb.BookedSeats{
+			SeatNumber:      val.SeatNumber,
+			IsBooked:        val.IsBooked,
+			Id:              int32(val.ID),
+			MovieTimeSlotID: int32(val.MovieTimeSlotID),
+			SeatMatrixID:    int32(val.SeatMatrixID),
+		}
+
+		seats = append(seats, seat)
+	}
+
+	return &moviedb.GetBookedSeatsResponse{
+		Status:      200,
+		Message:     "success",
+		Error:       "",
+		BookedSeats: seats,
+	}, nil
+}
+
+func (m *MoviedbService) IsValidToCommitSeatsForBooking(ctx context.Context, in *moviedb.IsValidToCommitSeatsForBooking_Request) (*moviedb.IsValidToCommitSeatsForBooking_Response, error) {
+
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+
+	done := make(chan struct{})
+	var isValid bool
+	var err error
+	var toBeBookedSeats []struct {
+		ID         int32
+		SeatNumber string
+		Price      int32
+		MovieName  string
+	}
+
+	go func() {
+		isValid, toBeBookedSeats, err = m.MovieDB.IsValidToCommitSeatsForBooking(int(in.MovieTimeSlotId), in.SeatMatrixIds)
+		close(done)
+	}()
+
+	select {
+	case <-ctx.Done():
+		return &moviedb.IsValidToCommitSeatsForBooking_Response{
+			Isvalid: false,
+			Error:   "Context timed out",
+			Status:  400,
+		}, nil
+	case <-done:
+		if err != nil {
+			return &moviedb.IsValidToCommitSeatsForBooking_Response{
+				Isvalid:         false,
+				Error:           err.Error(),
+				Status:          500,
+				ToBeBookedSeats: nil,
+			}, err
+		}
+		if !isValid {
+			return &moviedb.IsValidToCommitSeatsForBooking_Response{
+				Isvalid:         false,
+				Error:           "",
+				Status:          400,
+				ToBeBookedSeats: nil,
+			}, nil
+		}
+
+		var toBeBookedSeats2 []*moviedb.BookedSeats
+
+		for _, v := range toBeBookedSeats {
+			toBeBookedSeats2 = append(toBeBookedSeats2, &moviedb.BookedSeats{
+				Id:         int32(v.ID),
+				SeatNumber: v.SeatNumber,
+				Price:      v.Price,
+				MovieName:  v.MovieName,
+			})
+		}
+
+		return &moviedb.IsValidToCommitSeatsForBooking_Response{
+			Isvalid:         true,
+			Error:           "",
+			Status:          200,
+			ToBeBookedSeats: toBeBookedSeats2,
+		}, nil
+	}
+}
