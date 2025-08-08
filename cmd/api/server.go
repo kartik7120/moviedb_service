@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/kartik7120/booking_moviedb_service/cmd/consumers"
 	moviedb "github.com/kartik7120/booking_moviedb_service/cmd/grpcServer"
 	"github.com/kartik7120/booking_moviedb_service/cmd/models"
 	log "github.com/sirupsen/logrus"
@@ -15,7 +16,8 @@ import (
 
 type MoviedbService struct {
 	moviedb.UnimplementedMovieDBServiceServer
-	MovieDB *MovieDB
+	MovieDB  *MovieDB
+	Consumer consumers.Consumer
 }
 
 func NewMoviedbService() *MoviedbService {
@@ -1388,4 +1390,47 @@ func (m *MoviedbService) IsValidToCommitSeatsForBooking(ctx context.Context, in 
 			ToBeBookedSeats: toBeBookedSeats2,
 		}, nil
 	}
+}
+
+// Lock the seats when seats are selected and before payment confirmation
+// This prevents other users from booking the same seats while the payment is being processed.
+// The seats will be locked for a short duration (e.g., 10 minutes) to allow the user to complete the payment.
+func (m *MoviedbService) LockSeatsForBooking(ctx context.Context, in *moviedb.GetBookedSeatsDetailsRequest) (*moviedb.GetBookedSeatsDetailsResponse, error) {
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+
+	status, err := m.MovieDB.LockBookedSeats(in.BookedSeatsIds)
+
+	if status != 200 || err != nil {
+		return &moviedb.GetBookedSeatsDetailsResponse{
+			Status:      int32(status),
+			Message:     "error locking seats for booking",
+			BookedSeats: nil,
+			Error:       err.Error(),
+		}, nil
+	}
+
+	return &moviedb.GetBookedSeatsDetailsResponse{
+		Status:      200,
+		Message:     "Seats locked successfully",
+		BookedSeats: nil, // No booked seats returned in this case
+		Error:       "",
+	}, nil
+}
+
+func (m *MoviedbService) CreateTicket(ctx context.Context, in *moviedb.CreateTicketRequest) (*moviedb.CreateRequestResponse, error) {
+
+	status, err := m.MovieDB.CreateTicket(in.IdempotentKey, in.TrasactionId)
+
+	if err != nil || status != 200 {
+		return &moviedb.CreateRequestResponse{
+			Status: int32(status),
+			Error:  err.Error(),
+		}, err
+	}
+
+	return &moviedb.CreateRequestResponse{
+		Status: 200,
+		Error:  "",
+	}, nil
 }

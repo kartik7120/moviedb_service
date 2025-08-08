@@ -400,6 +400,16 @@ message IsValidToCommitSeatsForBooking_Response {
     repeated BookedSeats toBeBookedSeats = 4;
 }
 
+message CreateTicketRequest {
+    string idempotent_key = 1;
+    string trasaction_id = 2;
+}
+
+message CreateRequestResponse {
+    int32 status = 1;
+    string error = 2;
+}
+
 service MovieDBService {
     rpc AddMovie (Movie) returns (MovieResponse);
     rpc GetMovie (MovieRequest) returns (MovieResponse);
@@ -432,4 +442,6 @@ service MovieDBService {
     rpc GetBookedSeats(GetBookedSeatsRequest) returns (GetBookedSeatsResponse);
     // rpc GetBookedSeatsDetails(GetBookedSeatsDetailsRequest) returns (GetBookedSeatsDetailsResponse);
     rpc IsValidToCommitSeatsForBooking(IsValidToCommitSeatsForBooking_Request) returns (IsValidToCommitSeatsForBooking_Response);
+    rpc LockBookedSeats(GetBookedSeatsDetailsRequest) returns (GetBookedSeatsDetailsResponse);
+    rpc CreateTicket(CreateTicketRequest) returns (CreateRequestResponse);
 }

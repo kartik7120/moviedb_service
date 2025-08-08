@@ -944,3 +944,92 @@ func (m *MovieDB) IsValidToCommitSeatsForBooking(movie_time_slot_id int, seatMat
 
 	return true, toBeBookedSeats2, nil
 }
+
+func ptrTime(t time.Time) *time.Time {
+	return &t
+}
+
+func (m *MovieDB) LockBookedSeats(bookedSeatsIDs []int32) (int, error) {
+	var bookedSeats []models.BookedSeats
+
+	// Lock the booked seats for the given IDs
+
+	result := m.DB.Conn.Model(&models.BookedSeats{}).Where("id IN ?", bookedSeatsIDs).Find(&bookedSeats)
+
+	if result.Error != nil {
+		return 500, result.Error
+	}
+
+	// Before locking, check if the seats are already booked
+
+	for _, seat := range bookedSeats {
+		if seat.IsBooked {
+			return 400, fmt.Errorf("seat %s is already booked", seat.SeatNumber)
+		}
+	}
+
+	// Before locking, check if it is locked by some other thread
+
+	for _, seat := range bookedSeats {
+		if seat.LockedUntil != nil && seat.LockedUntil.After(time.Now()) {
+			return 400, fmt.Errorf("seat %s is already locked until %s", seat.SeatNumber, seat.LockedUntil.Format(time.RFC3339))
+		}
+	}
+
+	// Update the LockedUntil field to lock seat for next 15 minutes and all should happen in a transaction
+
+	tx := m.DB.Conn.Begin()
+
+	if tx.Error != nil {
+		return 500, tx.Error
+	}
+
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	for i := range bookedSeats {
+		bookedSeats[i].LockedUntil = ptrTime(time.Now().Add(15 * time.Minute)) // Lock the seat for 15 minutes
+		bookedSeats[i].IsBooked = true                                         // Mark the seat as booked
+		if err := tx.Save(&bookedSeats[i]).Error; err != nil {
+			tx.Rollback()
+			return 500, err
+		}
+	}
+
+	if len(bookedSeats) == 0 {
+		return 404, errors.New("no booked seats found for the given IDs")
+	}
+
+	// If we reach here, it means the seats are successfully locked
+	return 200, nil
+}
+
+func (m *MovieDB) CreateTicket(idempotent_key string, transaction_id string) (int, error) {
+
+	var idempotent models.Idempotent
+
+	result := m.DB.Conn.Model(&models.Idempotent{}).Where("idempotent_key = ?", idempotent_key).Find(&idempotent)
+
+	if result.Error != nil {
+		return 500, result.Error
+	}
+
+	result = m.DB.Conn.Model(&models.Ticket{}).Create(&models.Ticket{
+		BookedSeatsID: idempotent.BookedSeatsId,
+		CustomerID:    idempotent.CustomerID,
+		TransactionID: transaction_id,
+	})
+
+	if result.Error != nil {
+		return 500, result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return 500, errors.New("failed to create ticket, no rows affected")
+	}
+
+	return 200, nil
+}

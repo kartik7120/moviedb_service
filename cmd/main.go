@@ -8,8 +8,10 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/kartik7120/booking_moviedb_service/cmd/api"
+	"github.com/kartik7120/booking_moviedb_service/cmd/consumers"
 	movie "github.com/kartik7120/booking_moviedb_service/cmd/grpcServer"
 	"github.com/kartik7120/booking_moviedb_service/cmd/helper"
+	"github.com/rabbitmq/amqp091-go"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -56,6 +58,38 @@ func main() {
 		log.Error("Error connecting to database")
 		panic(err)
 	}
+
+	conn, err := amqp091.Dial("amqp://guest:guest@localhost:5672/")
+
+	if err != nil {
+		log.Error("error connecting to to rabbitmq")
+		os.Exit(1)
+		return
+	}
+	defer conn.Close()
+
+	ch, err := conn.Channel()
+
+	if err != nil {
+		log.Error("error opening a channel")
+		os.Exit(1)
+		return
+	}
+
+	defer ch.Close()
+
+	consumer := consumers.NewConsumer(ch)
+
+	go func() {
+		log.Info("Listening on incoming message from Send_Mail_Consumer")
+		err := consumer.Send_Mail_Consumer()
+		if err != nil {
+			log.Error("failed to consume send mail messages")
+			os.Exit(1)
+			return
+		}
+
+	}()
 
 	moviedbObj := api.NewMovieDB()
 

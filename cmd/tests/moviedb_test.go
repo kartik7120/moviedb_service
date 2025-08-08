@@ -815,6 +815,8 @@ func TestMovieDB(t *testing.T) {
 
 		m.DB.Conn = conn
 
-		m.DB.Conn.AutoMigrate(&models.BookedSeats{}, &models.MovieTimeSlot{}, &models.CastAndCrew{}, &models.Review{}, &models.Venue{}, &models.SeatMatrix{}, &models.Movie{}, &models.User{})
+		// m.DB.Conn.AutoMigrate(&models.BookedSeats{}, &models.MovieTimeSlot{}, &models.CastAndCrew{}, &models.Review{}, &models.Venue{}, &models.SeatMatrix{}, &models.Movie{}, &models.User{}, &models.Idempotent{})
+
+		m.DB.Conn.AutoMigrate(&models.Idempotent{})
 	})
 }

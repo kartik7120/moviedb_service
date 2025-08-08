@@ -15,33 +15,42 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
+type SendMailStruct struct {
+	To       string
+	Name     string
+	Text     string
+	Html     string
+	Category string
+	Subject  string
+}
+
 var validate *validator.Validate
 
 // If this mail implementation is not working for us then we can also host mailhog on our local machine
 
-func SendMail(to string, name string, text string, html string, category string, subject string) error {
+func SendMail(s SendMailStruct) error {
 
 	validate = validator.New()
 
 	// validating if the email is valid
 	log.Info("Starting to send email")
 
-	err := validate.Var(to, "email")
+	err := validate.Var(s.To, "email")
 
 	if err != nil {
 		log.Error("Invalid email", err)
 		return err
 	}
 
-	if len(text) == 0 && len(html) == 0 {
+	if len(s.Text) == 0 && len(s.Html) == 0 {
 		log.Error("text or html is required")
 		return fmt.Errorf("text or html is required")
 	}
 
 	// check if text or html does not contain any malicious code
 
-	if len(text) > 0 {
-		err = validate.Var(text, "printascii")
+	if len(s.Text) > 0 {
+		err = validate.Var(s.Text, "printascii")
 
 		if err != nil {
 			log.Error("Invalid text", err)
@@ -49,16 +58,16 @@ func SendMail(to string, name string, text string, html string, category string,
 		}
 	}
 
-	if len(html) > 0 {
+	if len(s.Html) > 0 {
 
-		err = validate.Var(html, "printascii")
+		err = validate.Var(s.Html, "printascii")
 
 		if err != nil {
 			log.Error("Invalid html")
 			return err
 		}
 
-		err = validate.Var(html, "html")
+		err = validate.Var(s.Html, "html")
 
 		if err != nil {
 			log.Error("Invalid html", err)
@@ -67,8 +76,8 @@ func SendMail(to string, name string, text string, html string, category string,
 
 	}
 
-	if len(subject) > 0 {
-		err = validate.Var(subject, "printascii")
+	if len(s.Subject) > 0 {
+		err = validate.Var(s.Subject, "printascii")
 
 		if err != nil {
 			log.Error("Invalid subject")
@@ -81,7 +90,7 @@ func SendMail(to string, name string, text string, html string, category string,
 
 	payloadString := ""
 
-	if len(html) > 0 {
+	if len(s.Html) > 0 {
 		payloadString = fmt.Sprintf(`{
             "from": {
                 "email": "hello@demomailtrap.co",
@@ -95,7 +104,7 @@ func SendMail(to string, name string, text string, html string, category string,
             "subject": %s,
             "html": %s,
             "category": %s
-        }`, jsonEscape(name), jsonEscape(to), jsonEscape(subject), jsonEscape(html), jsonEscape(category))
+        }`, jsonEscape(s.Name), jsonEscape(s.To), jsonEscape(s.Subject), jsonEscape(s.Html), jsonEscape(s.Category))
 	} else {
 		payloadString = fmt.Sprintf(`{
                 "from": {
@@ -110,7 +119,7 @@ func SendMail(to string, name string, text string, html string, category string,
                 "subject": %s,
                 "text": %s,
                 "category": %s
-            }`, jsonEscape(name), jsonEscape(to), jsonEscape(subject), jsonEscape(text), jsonEscape(category))
+            }`, jsonEscape(s.Name), jsonEscape(s.To), jsonEscape(s.Subject), jsonEscape(s.Html), jsonEscape(s.Category))
 	}
 
 	log.Info(payloadString)
