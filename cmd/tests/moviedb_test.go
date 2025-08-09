@@ -437,84 +437,263 @@ func TestMovieDB(t *testing.T) {
 		// 	},
 		// }
 
+		// movie := models.Movie{
+		// 	Title:       "Tron: Legacy",
+		// 	Description: "The son of a virtual world designer goes looking for his father and ends up inside the digital world that his father designed. He meets his father's corrupted creation and a unique ally who was born inside the digital world.",
+		// 	ReleaseDate: time.Date(2025, 4, 5, 0, 0, 0, 0, time.UTC), // Today's date
+		// 	PosterURL:   "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/9xkGLvAxu7f5PawQ6qJ4fF1wR0i.jpg",
+		// 	Duration:    125, // 2 hours 5 minutes
+		// 	Language:    pq.StringArray([]string{"English"}),
+		// 	Type:        pq.StringArray([]string{"Action", "Science Fiction", "Adventure"}),
+		// 	MovieResolution: pq.StringArray([]string{
+		// 		"4K", "1080p", "720p",
+		// 	}),
+		// 	CastCrew: []models.CastAndCrew{
+		// 		{Type: "Cast", Name: "Garrett Hedlund", Character: "Sam Flynn", PhotoURL: "https://example.com/garrett_hedlund.jpg"},
+		// 		{Type: "Cast", Name: "Jeff Bridges", Character: "Kevin Flynn / Clu", PhotoURL: "https://example.com/jeff_bridges.jpg"},
+		// 		{Type: "Cast", Name: "Olivia Wilde", Character: "Quorra", PhotoURL: "https://example.com/olivia_wilde.jpg"},
+		// 		{Type: "Crew", Name: "Joseph Kosinski", Character: "Director", PhotoURL: "https://example.com/joseph_kosinski.jpg"},
+		// 	},
+		// 	Ranking: 11,
+		// 	Votes:   1350,
+		// 	Venues: []models.Venue{
+		// 		{
+		// 			Name:                 "Grid Central IMAX",
+		// 			Type:                 "IMAX 3D",
+		// 			Address:              "88 Lightcycle Ave, San Francisco, CA",
+		// 			Latitude:             37.7749,
+		// 			Longitude:            -122.4194,
+		// 			Rows:                 30,
+		// 			Columns:              40,
+		// 			ScreenNumber:         7,
+		// 			MovieFormatSupported: pq.StringArray([]string{"IMAX 3D", "2D", "Dolby Atmos"}),
+		// 			LanguagesSupported:   pq.StringArray([]string{"English"}),
+
+		// 			// MovieTimeSlots: []models.MovieTimeSlot{
+		// 			// 	{
+		// 			// 		StartTime:   "17:00",
+		// 			// 		EndTime:     "19:05",
+		// 			// 		Duration:    125,
+		// 			// 		Date:        time.Date(2025, 4, 5, 0, 0, 0, 0, time.UTC),
+		// 			// 		MovieFormat: "IMAX 3D",
+		// 			// 	},
+		// 			// 	{
+		// 			// 		StartTime:   "20:00",
+		// 			// 		EndTime:     "22:05",
+		// 			// 		Duration:    125,
+		// 			// 		Date:        time.Date(2025, 4, 5, 0, 0, 0, 0, time.UTC),
+		// 			// 		MovieFormat: "Dolby Atmos",
+		// 			// 	},
+		// 			// },
+		// 		},
+		// 	},
+		// }
+
+		// st := time.Date(2025, 4, 5, 16, 0, 0, 0, time.UTC)
+		// et := time.Date(2025, 4, 5, 19, 0, 0, 0, time.UTC)
+
+		// st2 := time.Date(2025, 4, 6, 20, 0, 0, 0, time.UTC)
+		// et2 := time.Date(2025, 4, 6, 23, 0, 0, 0, time.UTC)
+
+		// _, status, err := m.AddMovie(movie, []models.MovieTimeSlot{
+		// 	{
+		// 		StartTime:   st,  // 4:00 PM
+		// 		EndTime:     et,  // 7:00 PM
+		// 		Duration:    180, // 3 hours
+		// 		Date:        time.Date(2025, 4, 5, 0, 0, 0, 0, time.UTC),
+		// 		MovieFormat: "IMAX",
+		// 	},
+		// 	{
+		// 		StartTime:   st2, // 8:00 PM
+		// 		EndTime:     et2, // 11:00 PM
+		// 		Duration:    180, // 3 hours
+		// 		Date:        time.Date(2025, 4, 5, 0, 0, 0, 0, time.UTC),
+		// 		MovieFormat: "3D",
+		// 	},
+		// }, []models.SeatMatrix{
+		// 	{Row: 1, Column: 1, Price: 1500, SeatNumber: "A1", Type: "Platinum"},
+		// 	{Row: 1, Column: 2, Price: 1500, SeatNumber: "A2", Type: "Platinum"},
+		// 	{Row: 2, Column: 1, Price: 1200, SeatNumber: "B1", Type: "Gold"},
+		// 	{Row: 2, Column: 2, Price: 1200, SeatNumber: "B2", Type: "Gold"},
+		// })
+
+		// releaseDate := time.Now().AddDate(0, 2, 0) // 2 months from today
+
+		// movie := models.Movie{
+		// 	Title:       "Dune: Part Two",
+		// 	Description: "Paul Atreides unites with Chani and the Fremen while seeking revenge against those who destroyed his family, and faces a choice between the love of his life and the fate of the universe.",
+		// 	ReleaseDate: releaseDate,
+		// 	PosterURL:   "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/8b8R8l88Qje9dn9OE8PY05Nxl1X.jpg",
+		// 	Duration:    166, // 2 hours 46 minutes
+		// 	Language:    pq.StringArray([]string{"English"}),
+		// 	Type:        pq.StringArray([]string{"Science Fiction", "Adventure", "Drama"}),
+		// 	MovieResolution: pq.StringArray([]string{
+		// 		"4K", "1080p", "720p",
+		// 	}),
+		// 	CastCrew: []models.CastAndCrew{
+		// 		{Type: "Cast", Name: "Timothée Chalamet", Character: "Paul Atreides", PhotoURL: "https://example.com/timothee_chalamet.jpg"},
+		// 		{Type: "Cast", Name: "Zendaya", Character: "Chani", PhotoURL: "https://example.com/zendaya.jpg"},
+		// 		{Type: "Cast", Name: "Rebecca Ferguson", Character: "Lady Jessica", PhotoURL: "https://example.com/rebecca_ferguson.jpg"},
+		// 		{Type: "Crew", Name: "Denis Villeneuve", Character: "Director", PhotoURL: "https://example.com/denis_villeneuve.jpg"},
+		// 	},
+		// 	Ranking: 5,
+		// 	Votes:   2450,
+		// 	Venues: []models.Venue{
+		// 		{
+		// 			Name:                 "Arrakis Grand IMAX",
+		// 			Type:                 "IMAX",
+		// 			Address:              "101 Desert Way, Los Angeles, CA",
+		// 			Latitude:             34.0522,
+		// 			Longitude:            -118.2437,
+		// 			Rows:                 25,
+		// 			Columns:              35,
+		// 			ScreenNumber:         1,
+		// 			MovieFormatSupported: pq.StringArray([]string{"IMAX", "3D", "Dolby Atmos"}),
+		// 			LanguagesSupported:   pq.StringArray([]string{"English"}),
+		// 		},
+		// 	},
+		// }
+
+		// // Movie time slots based on release date
+		// st := time.Date(releaseDate.Year(), releaseDate.Month(), releaseDate.Day(), 16, 0, 0, 0, time.UTC)
+		// et := st.Add(3 * time.Hour)
+
+		// st2 := st.AddDate(0, 0, 1).Add(4 * time.Hour) // next day, 8 PM
+		// et2 := st2.Add(3 * time.Hour)
+
+		// _, status, err := m.AddMovie(movie, []models.MovieTimeSlot{
+		// 	{
+		// 		StartTime:   st,
+		// 		EndTime:     et,
+		// 		Duration:    180,
+		// 		Date:        releaseDate,
+		// 		MovieFormat: "IMAX",
+		// 	},
+		// 	{
+		// 		StartTime:   st2,
+		// 		EndTime:     et2,
+		// 		Duration:    180,
+		// 		Date:        releaseDate.AddDate(0, 0, 1),
+		// 		MovieFormat: "Dolby Atmos",
+		// 	},
+		// }, []models.SeatMatrix{})
+
+		// releaseDate := time.Now().AddDate(0, 2, 0) // 2 months from today
+
+		// movie := models.Movie{
+		// 	Title:       "Avatar: The Way of Water",
+		// 	Description: "Jake Sully lives with his newfound family on the planet of Pandora. Once a familiar threat returns, Jake must work with Neytiri and the army of the Na'vi to protect their home.",
+		// 	ReleaseDate: releaseDate,
+		// 	PosterURL:   "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/t6HIqrRAclMCA60NsSmeqe9RmNV.jpg",
+		// 	Duration:    192, // 3 hours 12 minutes
+		// 	Language:    pq.StringArray([]string{"English"}),
+		// 	Type:        pq.StringArray([]string{"Action", "Adventure", "Science Fiction"}),
+		// 	MovieResolution: pq.StringArray([]string{
+		// 		"4K", "1080p", "720p",
+		// 	}),
+		// 	CastCrew: []models.CastAndCrew{
+		// 		{Type: "Cast", Name: "Sam Worthington", Character: "Jake Sully", PhotoURL: "https://example.com/sam_worthington.jpg"},
+		// 		{Type: "Cast", Name: "Zoe Saldaña", Character: "Neytiri", PhotoURL: "https://example.com/zoe_saldana.jpg"},
+		// 		{Type: "Cast", Name: "Sigourney Weaver", Character: "Kiri", PhotoURL: "https://example.com/sigourney_weaver.jpg"},
+		// 		{Type: "Crew", Name: "James Cameron", Character: "Director", PhotoURL: "https://example.com/james_cameron.jpg"},
+		// 	},
+		// 	Ranking: 3,
+		// 	Votes:   3200,
+		// 	Venues: []models.Venue{
+		// 		{
+		// 			Name:                 "Pandora Ocean Dome",
+		// 			Type:                 "IMAX 3D",
+		// 			Address:              "500 Reef Street, Honolulu, HI",
+		// 			Latitude:             21.3069,
+		// 			Longitude:            -157.8583,
+		// 			Rows:                 28,
+		// 			Columns:              38,
+		// 			ScreenNumber:         2,
+		// 			MovieFormatSupported: pq.StringArray([]string{"IMAX 3D", "Dolby Atmos", "3D"}),
+		// 			LanguagesSupported:   pq.StringArray([]string{"English"}),
+		// 		},
+		// 	},
+		// }
+
+		// // Movie time slots based on release date
+		// st := time.Date(releaseDate.Year(), releaseDate.Month(), releaseDate.Day(), 17, 0, 0, 0, time.UTC)
+		// et := st.Add(3 * time.Hour)
+
+		// st2 := st.AddDate(0, 0, 1).Add(3 * time.Hour) // next day, 8 PM
+		// et2 := st2.Add(3 * time.Hour)
+
+		// _, status, err := m.AddMovie(movie, []models.MovieTimeSlot{
+		// 	{
+		// 		StartTime:   st,
+		// 		EndTime:     et,
+		// 		Duration:    180,
+		// 		Date:        releaseDate,
+		// 		MovieFormat: "IMAX 3D",
+		// 	},
+		// 	{
+		// 		StartTime:   st2,
+		// 		EndTime:     et2,
+		// 		Duration:    180,
+		// 		Date:        releaseDate.AddDate(0, 0, 1),
+		// 		MovieFormat: "Dolby Atmos",
+		// 	},
+		// }, []models.SeatMatrix{
+		// 	{Row: 1, Column: 1, Price: 2000, SeatNumber: "A1", Type: "Platinum"},
+		// 	{Row: 1, Column: 2, Price: 2000, SeatNumber: "A2", Type: "Platinum"},
+		// 	{Row: 2, Column: 1, Price: 1500, SeatNumber: "B1", Type: "Gold"},
+		// 	{Row: 2, Column: 2, Price: 1500, SeatNumber: "B2", Type: "Gold"},
+		// })
+
+		releaseDate := time.Now().AddDate(0, 0, -3) // Three days ago
+
 		movie := models.Movie{
-			Title:       "Tron: Legacy",
-			Description: "The son of a virtual world designer goes looking for his father and ends up inside the digital world that his father designed. He meets his father's corrupted creation and a unique ally who was born inside the digital world.",
-			ReleaseDate: time.Date(2025, 4, 5, 0, 0, 0, 0, time.UTC), // Today's date
-			PosterURL:   "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/9xkGLvAxu7f5PawQ6qJ4fF1wR0i.jpg",
-			Duration:    125, // 2 hours 5 minutes
-			Language:    pq.StringArray([]string{"English"}),
-			Type:        pq.StringArray([]string{"Action", "Science Fiction", "Adventure"}),
-			MovieResolution: pq.StringArray([]string{
-				"4K", "1080p", "720p",
-			}),
+			Title:           "Freakier Friday",
+			Description:     "A fantasy comedy sequel where the mother and daughter swap bodies again under magical—and unpredictable—circumstances.",
+			ReleaseDate:     releaseDate,
+			PosterURL:       "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/your_poster_path.jpg", // replace with actual URL
+			Duration:        111,                                                                        // minutes
+			Language:        pq.StringArray([]string{"English"}),
+			Type:            pq.StringArray([]string{"Fantasy", "Comedy", "Family"}),
+			MovieResolution: pq.StringArray([]string{"4K", "1080p", "720p"}),
 			CastCrew: []models.CastAndCrew{
-				{Type: "Cast", Name: "Garrett Hedlund", Character: "Sam Flynn", PhotoURL: "https://example.com/garrett_hedlund.jpg"},
-				{Type: "Cast", Name: "Jeff Bridges", Character: "Kevin Flynn / Clu", PhotoURL: "https://example.com/jeff_bridges.jpg"},
-				{Type: "Cast", Name: "Olivia Wilde", Character: "Quorra", PhotoURL: "https://example.com/olivia_wilde.jpg"},
-				{Type: "Crew", Name: "Joseph Kosinski", Character: "Director", PhotoURL: "https://example.com/joseph_kosinski.jpg"},
+				{Type: "Cast", Name: "Jamie Lee Curtis", Character: "Mom", PhotoURL: "https://example.com/jamie_lee_curtis.jpg"},
+				{Type: "Cast", Name: "Lindsay Lohan", Character: "Daughter", PhotoURL: "https://example.com/lindsay_lohan.jpg"},
+				{Type: "Crew", Name: "Nisha Ganatra", Character: "Director", PhotoURL: "https://example.com/nisha_ganatra.jpg"},
 			},
-			Ranking: 11,
-			Votes:   1350,
+			Ranking: 8,
+			Votes:   2100,
 			Venues: []models.Venue{
 				{
-					Name:                 "Grid Central IMAX",
-					Type:                 "IMAX 3D",
-					Address:              "88 Lightcycle Ave, San Francisco, CA",
-					Latitude:             37.7749,
-					Longitude:            -122.4194,
-					Rows:                 30,
-					Columns:              40,
-					ScreenNumber:         7,
-					MovieFormatSupported: pq.StringArray([]string{"IMAX 3D", "2D", "Dolby Atmos"}),
+					Name:                 "Magic Mirror Cinema",
+					Type:                 "Digital",
+					Address:              "123 Elm Street, Los Angeles, CA",
+					Latitude:             34.0522,
+					Longitude:            -118.2437,
+					Rows:                 20,
+					Columns:              30,
+					ScreenNumber:         5,
+					MovieFormatSupported: pq.StringArray([]string{"Digital", "3D", "Dolby Atmos"}),
 					LanguagesSupported:   pq.StringArray([]string{"English"}),
-
-					// MovieTimeSlots: []models.MovieTimeSlot{
-					// 	{
-					// 		StartTime:   "17:00",
-					// 		EndTime:     "19:05",
-					// 		Duration:    125,
-					// 		Date:        time.Date(2025, 4, 5, 0, 0, 0, 0, time.UTC),
-					// 		MovieFormat: "IMAX 3D",
-					// 	},
-					// 	{
-					// 		StartTime:   "20:00",
-					// 		EndTime:     "22:05",
-					// 		Duration:    125,
-					// 		Date:        time.Date(2025, 4, 5, 0, 0, 0, 0, time.UTC),
-					// 		MovieFormat: "Dolby Atmos",
-					// 	},
-					// },
 				},
 			},
 		}
 
-		st := time.Date(2025, 4, 5, 16, 0, 0, 0, time.UTC)
-		et := time.Date(2025, 4, 5, 19, 0, 0, 0, time.UTC)
-
-		st2 := time.Date(2025, 4, 6, 20, 0, 0, 0, time.UTC)
-		et2 := time.Date(2025, 4, 6, 23, 0, 0, 0, time.UTC)
+		st := time.Date(releaseDate.Year(), releaseDate.Month(), releaseDate.Day(), 18, 30, 0, 0, time.UTC)
+		et := st.Add(2*time.Hour - 30*time.Minute) // 2 hours duration
 
 		_, status, err := m.AddMovie(movie, []models.MovieTimeSlot{
 			{
-				StartTime:   st,  // 4:00 PM
-				EndTime:     et,  // 7:00 PM
-				Duration:    180, // 3 hours
-				Date:        time.Date(2025, 4, 5, 0, 0, 0, 0, time.UTC),
-				MovieFormat: "IMAX",
-			},
-			{
-				StartTime:   st2, // 8:00 PM
-				EndTime:     et2, // 11:00 PM
-				Duration:    180, // 3 hours
-				Date:        time.Date(2025, 4, 5, 0, 0, 0, 0, time.UTC),
-				MovieFormat: "3D",
+				StartTime:   st,
+				EndTime:     et,
+				Duration:    int(et.Sub(st).Minutes()),
+				Date:        releaseDate,
+				MovieFormat: "Digital",
 			},
 		}, []models.SeatMatrix{
-			{Row: 1, Column: 1, Price: 1500, SeatNumber: "A1", Type: "Platinum"},
-			{Row: 1, Column: 2, Price: 1500, SeatNumber: "A2", Type: "Platinum"},
-			{Row: 2, Column: 1, Price: 1200, SeatNumber: "B1", Type: "Gold"},
-			{Row: 2, Column: 2, Price: 1200, SeatNumber: "B2", Type: "Gold"},
+			{Row: 1, Column: 1, Price: 1200, SeatNumber: "A1", Type: "Gold"},
+			{Row: 1, Column: 2, Price: 1200, SeatNumber: "A2", Type: "Gold"},
+			{Row: 2, Column: 1, Price: 900, SeatNumber: "B1", Type: "Silver"},
+			{Row: 2, Column: 2, Price: 900, SeatNumber: "B2", Type: "Silver"},
 		})
 
 		if err != nil {
@@ -817,6 +996,6 @@ func TestMovieDB(t *testing.T) {
 
 		// m.DB.Conn.AutoMigrate(&models.BookedSeats{}, &models.MovieTimeSlot{}, &models.CastAndCrew{}, &models.Review{}, &models.Venue{}, &models.SeatMatrix{}, &models.Movie{}, &models.User{}, &models.Idempotent{})
 
-		m.DB.Conn.AutoMigrate(&models.Idempotent{})
+		m.DB.Conn.AutoMigrate(&models.SeatMatrix{})
 	})
 }

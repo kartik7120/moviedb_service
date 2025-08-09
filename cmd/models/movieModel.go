@@ -18,7 +18,7 @@ type CastAndCrew struct {
 
 type SeatMatrix struct {
 	gorm.Model
-	SeatNumber string `json:"seat_number" gorm:"not null;unique"`
+	SeatNumber string `json:"seat_number" gorm:"not null;uniqueIndex:idx_unique_seat"`
 	Row        int    `json:"row" gorm:"not null;uniqueIndex:idx_unique_seat"`
 	Column     int    `json:"column" gorm:"not null;uniqueIndex:idx_unique_seat"`
 	Price      int    `json:"price" gorm:"not null;uniqueIndex:idx_unique_seat"`
