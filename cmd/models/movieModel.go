@@ -72,7 +72,7 @@ type Movie struct {
 	Duration        int            `json:"duration" gorm:"not null"`
 	Language        pq.StringArray `json:"language" gorm:"type:text[];not null"`
 	Type            pq.StringArray `json:"type" gorm:"type:text[];not null"`
-	CastCrew        []CastAndCrew  `json:"cast_crew"`
+	CastCrew        []CastAndCrew  `json:"cast_crew" gorm:"foreignKey:MovieID"`
 	PosterURL       string         `json:"poster_url"`
 	TrailerURL      string         `json:"trailer_url"`
 	ReleaseDate     time.Time      `json:"release_date" gorm:"not null"`

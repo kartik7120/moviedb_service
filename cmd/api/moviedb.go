@@ -276,8 +276,8 @@ func (m *MovieDB) GetUpcomingMovies(date string) ([]models.Movie, int, error) {
 	}
 
 	// Calculate start and end dates
-	startDate := d.AddDate(0, 0, 14)
-	endDate := d.AddDate(0, 1, 14)
+	startDate := d.AddDate(0, 0, 1)
+	endDate := d.AddDate(0, 7, 0)
 
 	// Query the database
 	var movies []models.Movie
@@ -302,6 +302,7 @@ func (m *MovieDB) GetNowPlayingMovies(longitude, latitude int32) ([]models.Movie
 			Joins("JOIN movie_time_slots mts ON mts.movie_id = movies.id").
 			Where("movies.release_date <= ?", today).
 			Where("DATE(mts.date) <= ?", today).
+			Preload("CastCrew").
 			Group("movies.id").
 			Find(&movies).Error
 
@@ -320,6 +321,7 @@ func (m *MovieDB) GetNowPlayingMovies(longitude, latitude int32) ([]models.Movie
 		Where("movies.release_date <= ?", today).
 		Where("DATE(mts.date) <= ?", today).
 		Where("ST_DistanceSphere(ST_MakePoint(?, ?), ST_MakePoint(venue.longitude, venue.latitude)) <= ?", longitude, latitude, 30000).
+		Preload("CastCrew").
 		Group("movies.id").
 		Find(&movies).Error
 

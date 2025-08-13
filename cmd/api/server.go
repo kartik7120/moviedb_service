@@ -649,8 +649,21 @@ func (m *MoviedbService) GetNowPlayingMovies(ctx context.Context, in *moviedb.Ge
 	}
 
 	movielist := make([]*moviedb.Movie, 0)
+	var castAndCrew []*moviedb.CastAndCrew
 
 	for _, v := range movies {
+		castAndCrew = make([]*moviedb.CastAndCrew, 0)
+
+		for _, cc := range v.CastCrew {
+			cast_and_crew := &moviedb.CastAndCrew{
+				Type:          moviedb.CastAndCrewType(moviedb.CastAndCrewType_value[cc.Type]),
+				Name:          cc.Name,
+				CharacterName: cc.Character,
+				Photourl:      cc.PhotoURL,
+			}
+			castAndCrew = append(castAndCrew, cast_and_crew)
+		}
+
 		movielist = append(movielist, &moviedb.Movie{
 			Title:           v.Title,
 			Description:     v.Description,
@@ -664,6 +677,7 @@ func (m *MoviedbService) GetNowPlayingMovies(ctx context.Context, in *moviedb.Ge
 			Votes:           int64(v.Votes),
 			Ranking:         int32(v.Ranking),
 			Id:              int32(v.ID),
+			CastCrew:        castAndCrew,
 		})
 	}
 
