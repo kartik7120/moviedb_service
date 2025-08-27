@@ -109,7 +109,163 @@ func (m *MovieDB) AddVenue(venue models.Venue) (models.Venue, int, error) {
 	return venue, 200, nil
 }
 
-func (m *MovieDB) AddMovie(movie models.Movie, movieTimeSlots []models.MovieTimeSlot, seats []models.SeatMatrix) (models.Movie, int, error) {
+// func (m *MovieDB) AddMovie(movie models.Movie, movieTimeSlots []models.MovieTimeSlot, seats []models.SeatMatrix) (models.Movie, int, error) {
+// 	// Validate movie struct
+// 	if err := validate.Struct(movie); err != nil {
+// 		return movie, 400, err
+// 	}
+
+// 	// Start transaction
+// 	tx := m.DB.Conn.Begin()
+// 	if tx.Error != nil {
+// 		return movie, 500, tx.Error
+// 	}
+
+// 	// Ensure rollback on panic
+// 	defer func() {
+// 		if r := recover(); r != nil {
+// 			tx.Rollback()
+// 		}
+// 	}()
+
+// 	// Step 1: Insert Movie
+
+// 	movieObj := &models.Movie{
+// 		Title:               movie.Title,
+// 		Description:         movie.Description,
+// 		Duration:            movie.Duration,
+// 		Language:            movie.Language,
+// 		Type:                movie.Type,
+// 		CastCrew:            movie.CastCrew,
+// 		PosterURL:           movie.PosterURL,
+// 		ReleaseDate:         movie.ReleaseDate,
+// 		TrailerURL:          movie.TrailerURL,
+// 		MovieResolution:     movie.MovieResolution,
+// 		Ranking:             movie.Ranking,
+// 		Votes:               movie.Votes,
+// 		Reviews:             movie.Reviews,
+// 		ScreenWidePosterURL: movie.ScreenWidePosterURL,
+// 		LogoImageURL:        movie.LogoImageURL,
+// 	}
+
+// 	result := tx.Create(&movieObj)
+
+// 	if result.Error != nil {
+// 		tx.Rollback()
+// 		return movie, 500, result.Error
+// 	}
+
+// 	if result.RowsAffected == 0 {
+// 		tx.Rollback()
+// 		return movie, 500, errors.New("failed to insert movie, no rows affected")
+// 	}
+
+// 	// var newVenues []models.Venue
+
+// 	// for _, v := range movie.Venues {
+
+// 	// 	venueObj := tx.Create(&v)
+
+// 	// 	if venueObj.Error != nil {
+// 	// 		tx.Rollback()
+// 	// 		return movie, 500, result.Error
+// 	// 	}
+
+// 	// 	fmt.Println(v)
+
+// 	// 	newVenues = append(newVenues, v)
+// 	// }
+
+// 	// // Step 2: Insert Venues
+// 	// for _, v := range newVenues {
+// 	// 	venue := &v
+
+// 	// 	// Create Venue
+
+// 	// 	fmt.Println("Inserted Venue ID:", venue.ID) // Debugging
+// 	// 	fmt.Println("Movie ID: ", movieObj.ID)
+// 	// 	// Step 3: Insert MovieTimeSlots (from function parameter
+// 	// 	for j := range movieTimeSlots {
+// 	// 		movieTimeSlots[j].MovieID = movieObj.ID
+// 	// 		movieTimeSlots[j].VenueID = venue.ID
+// 	// 	}
+
+// 	// 	if len(movieTimeSlots) > 0 {
+// 	// 		if err := tx.Create(&movieTimeSlots).Error; err != nil {
+// 	// 			tx.Rollback()
+// 	// 			return movie, 500, fmt.Errorf("error inserting time slots: %v", err)
+// 	// 		}
+// 	// 	}
+
+// 	// 	// Step 4: Insert Seat Matrices (from function parameter)
+// 	// 	for k := range seats {
+// 	// 		seats[k].VenueID = venue.ID
+// 	// 	}
+
+// 	// 	if len(seats) > 0 {
+// 	// 		if err := tx.Create(&seats).Error; err != nil {
+// 	// 			tx.Rollback()
+// 	// 			return movie, 500, fmt.Errorf("error inserting seat matrix: %v", err)
+// 	// 		}
+// 	// 	}
+// 	// }
+
+// 	var newVenues []models.Venue
+
+// 	// Step 2: Insert Venues
+// 	for _, v := range movie.Venues {
+// 		venueObj := &v
+
+// 		if err := tx.Create(venueObj).Error; err != nil {
+// 			tx.Rollback()
+// 			return movie, 500, fmt.Errorf("error inserting venue: %v", err)
+// 		}
+
+// 		fmt.Println("Inserted Venue ID:", venueObj.ID)
+// 		fmt.Println("Movie ID: ", movieObj.ID)
+
+// 		// Step 3: Insert MovieTimeSlots (clone per venue)
+// 		for _, mts := range movieTimeSlots {
+// 			slot := mts
+
+// 			slot.VenueID = venueObj.ID
+// 			slot.MovieID = movieObj.ID
+
+// 			if err := tx.Create(&slot).Error; err != nil {
+// 				tx.Rollback()
+// 				return movie, 500, fmt.Errorf("error inserting time slot: %v", err)
+// 			}
+// 		}
+
+// 		// Step 4: Insert Seat Matrices (clone per venue)
+// 		for _, s := range seats {
+// 			seat := s
+
+// 			seat.VenueID = venueObj.ID
+
+// 			if err := tx.Create(&seat).Error; err != nil {
+// 				tx.Rollback()
+// 				return movie, 500, fmt.Errorf("error inserting seat: %v", err)
+// 			}
+// 		}
+
+// 		newVenues = append(newVenues, *venueObj)
+// 	}
+
+// 	// Step 5: Commit transaction
+// 	if err := tx.Commit().Error; err != nil {
+// 		return movie, 500, fmt.Errorf("commit error: %v", err)
+// 	}
+
+// 	return movie, 200, nil
+// }
+
+func (m *MovieDB) AddMovie(
+	movie models.Movie,
+	movieTimeSlots []models.MovieTimeSlot,
+	seats []models.SeatMatrix,
+) (models.Movie, int, error) {
+
 	// Validate movie struct
 	if err := validate.Struct(movie); err != nil {
 		return movie, 400, err
@@ -129,47 +285,59 @@ func (m *MovieDB) AddMovie(movie models.Movie, movieTimeSlots []models.MovieTime
 	}()
 
 	// Step 1: Insert Movie
-	result := tx.Create(&movie)
-	if result.Error != nil {
-		tx.Rollback()
-		return movie, 500, result.Error
+	movieObj := &models.Movie{
+		Title:               movie.Title,
+		Description:         movie.Description,
+		Duration:            movie.Duration,
+		Language:            movie.Language,
+		Type:                movie.Type,
+		CastCrew:            movie.CastCrew,
+		PosterURL:           movie.PosterURL, // fixed (was TrailerURL before)
+		ReleaseDate:         movie.ReleaseDate,
+		TrailerURL:          movie.TrailerURL,
+		MovieResolution:     movie.MovieResolution,
+		Ranking:             movie.Ranking,
+		Votes:               movie.Votes,
+		Reviews:             movie.Reviews,
+		ScreenWidePosterURL: movie.ScreenWidePosterURL,
+		LogoImageURL:        movie.LogoImageURL,
 	}
 
-	if result.RowsAffected == 0 {
+	if err := tx.Create(movieObj).Error; err != nil {
 		tx.Rollback()
-		return movie, 500, errors.New("failed to insert movie, no rows affected")
+		return movie, 500, fmt.Errorf("failed to insert movie: %v", err)
 	}
 
 	// Step 2: Insert Venues
-	for i := range movie.Venues {
-		venue := &movie.Venues[i]
+	for _, v := range movie.Venues {
+		venue := v
+		// venue. = movieObj.ID // ensure venue links to movie
 
-		// Create Venue
-
-		fmt.Println("Inserted Venue ID:", venue.ID) // Debugging
-
-		// Step 3: Insert MovieTimeSlots (from function parameter)
-		for j := range movieTimeSlots {
-			movieTimeSlots[j].MovieID = movie.ID
-			movieTimeSlots[j].VenueID = venue.ID
+		if err := tx.Create(&venue).Error; err != nil {
+			tx.Rollback()
+			return movie, 500, fmt.Errorf("failed to insert venue: %v", err)
 		}
 
-		if len(movieTimeSlots) > 0 {
-			if err := tx.Create(&movieTimeSlots).Error; err != nil {
+		// Step 3: Insert MovieTimeSlots for this Venue
+		for _, slot := range movieTimeSlots {
+			newSlot := slot
+			newSlot.MovieID = movieObj.ID
+			newSlot.VenueID = venue.ID
+
+			if err := tx.Create(&newSlot).Error; err != nil {
 				tx.Rollback()
-				return movie, 500, fmt.Errorf("error inserting time slots: %v", err)
+				return movie, 500, fmt.Errorf("failed to insert time slot: %v", err)
 			}
 		}
 
-		// Step 4: Insert Seat Matrices (from function parameter)
-		for k := range seats {
-			seats[k].VenueID = venue.ID
-		}
+		// Step 4: Insert SeatMatrix for this Venue
+		for _, seat := range seats {
+			newSeat := seat
+			newSeat.VenueID = venue.ID
 
-		if len(seats) > 0 {
-			if err := tx.Create(&seats).Error; err != nil {
+			if err := tx.Create(&newSeat).Error; err != nil {
 				tx.Rollback()
-				return movie, 500, fmt.Errorf("error inserting seat matrix: %v", err)
+				return movie, 500, fmt.Errorf("failed to insert seat matrix: %v", err)
 			}
 		}
 	}
@@ -179,7 +347,7 @@ func (m *MovieDB) AddMovie(movie models.Movie, movieTimeSlots []models.MovieTime
 		return movie, 500, fmt.Errorf("commit error: %v", err)
 	}
 
-	return movie, 200, nil
+	return *movieObj, 200, nil
 }
 
 func (m *MovieDB) UpdateMovie(movieID uint, movie models.Movie) (models.Movie, int, error) {
@@ -293,6 +461,7 @@ func (m *MovieDB) GetUpcomingMovies(date string) ([]models.Movie, int, error) {
 
 func (m *MovieDB) GetNowPlayingMovies(longitude, latitude int32) ([]models.Movie, int, error) {
 	today := time.Now().Truncate(24 * time.Hour)
+	todayMidNight := time.Now().AddDate(0, 0, 1).Truncate(24 * time.Hour)
 
 	var movies []models.Movie
 
@@ -300,7 +469,7 @@ func (m *MovieDB) GetNowPlayingMovies(longitude, latitude int32) ([]models.Movie
 		// If no coordinates are provided, fetch all movies released today or earlier
 		err := m.DB.Conn.
 			Joins("JOIN movie_time_slots mts ON mts.movie_id = movies.id").
-			Where("movies.release_date <= ?", today).
+			Where("movies.release_date <= ? OR movies.release_date < ?", today, todayMidNight).
 			Where("DATE(mts.date) <= ?", today).
 			Preload("CastCrew").
 			Group("movies.id").
@@ -522,30 +691,48 @@ func (m *MovieDB) GetMovieTimeSlots(startDate string, endDate string, movieID ui
 		return nil, nil, 400, err
 	}
 
-	// Query the database
-	result := m.DB.Conn.Debug().
-		Preload("MovieTimeSlots", func(db *gorm.DB) *gorm.DB {
-			return db.
-				Where("movie_id = ? AND start_time >= ? AND end_time <= ?", movieID, start.UTC(), end.UTC())
-		}).
-		Joins("JOIN movie_time_slots mts ON mts.venue_id = venues.id").
-		Where("mts.movie_id = ? AND mts.start_time >= ? AND mts.end_time <= ?", movieID, start.UTC(), end.UTC()).
-		// Adding Haversine formula in ORDER BY to calculate distance and sort results
-		Order(fmt.Sprintf(`
-        6371 * acos(
-            cos(radians(%f)) * cos(radians(venues.latitude)) *
-            cos(radians(venues.longitude) - radians(%f)) +
-            sin(radians(%f)) * sin(radians(venues.latitude))
-        ) ASC`, latitude, longitude, latitude)).
-		Group("venues.id").
-		Find(&venues)
+	if longitude == 0 && latitude == 0 {
+
+		result := m.DB.Conn.Debug().
+			Preload("MovieTimeSlots", func(db *gorm.DB) *gorm.DB {
+				return db.
+					Where("movie_id = ? AND start_time >= ? AND end_time <= ?", movieID, start.UTC(), end.UTC())
+			}).
+			Joins("JOIN movie_time_slots mts ON mts.venue_id = venues.id").
+			Where("mts.movie_id = ? AND mts.start_time >= ? AND mts.end_time <= ?", movieID, start.UTC(), end.UTC()).
+			Group("venues.id").
+			Find(&venues)
+
+		if result.Error != nil {
+			return nil, nil, 500, result.Error
+		}
+
+	} else {
+		// Query the database
+		result := m.DB.Conn.Debug().
+			Preload("MovieTimeSlots", func(db *gorm.DB) *gorm.DB {
+				return db.
+					Where("movie_id = ? AND start_time >= ? AND end_time <= ?", movieID, start.UTC(), end.UTC())
+			}).
+			Joins("JOIN movie_time_slots mts ON mts.venue_id = venues.id").
+			Where("mts.movie_id = ? AND mts.start_time >= ? AND mts.end_time <= ?", movieID, start.UTC(), end.UTC()).
+			// Adding Haversine formula in ORDER BY to calculate distance and sort results
+			Order(fmt.Sprintf(`
+			6371 * acos(
+				cos(radians(%f)) * cos(radians(venues.latitude)) *
+				cos(radians(venues.longitude) - radians(%f)) +
+				sin(radians(%f)) * sin(radians(venues.latitude))
+			) ASC`, latitude, longitude, latitude)).
+			Group("venues.id").
+			Find(&venues)
+
+		if result.Error != nil {
+			return nil, nil, 500, result.Error
+		}
+	}
 
 	for _, v := range venues {
 		movieTimeSlots = append(movieTimeSlots, v.MovieTimeSlots...)
-	}
-
-	if result.Error != nil {
-		return nil, nil, 500, result.Error
 	}
 
 	return venues, movieTimeSlots, 200, nil

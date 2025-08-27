@@ -45,10 +45,10 @@ func TestMovieDB(t *testing.T) {
 
 		// movieTimeSlotDate, err := time.Parse("2006-01-02", "2025-04-05")
 
-		if err != nil {
-			t.Errorf("error parsing movie time slot date")
-			return
-		}
+		// if err != nil {
+		// 	t.Errorf("error parsing movie time slot date")
+		// 	return
+		// }
 
 		// add movie to database
 		// movie := models.Movie{
@@ -644,57 +644,302 @@ func TestMovieDB(t *testing.T) {
 		// 	{Row: 2, Column: 2, Price: 1500, SeatNumber: "B2", Type: "Gold"},
 		// })
 
-		releaseDate := time.Now().AddDate(0, 0, -3) // Three days ago
+		// releaseDate := time.Now().AddDate(0, 0, 2) // Three days ago
+
+		// movie := models.Movie{
+		// 	Title:           "Freakier Friday",
+		// 	Description:     "A fantasy comedy sequel where the mother and daughter swap bodies again under magical—and unpredictable—circumstances.",
+		// 	ReleaseDate:     releaseDate,
+		// 	PosterURL:       "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/your_poster_path.jpg", // replace with actual URL
+		// 	Duration:        111,                                                                        // minutes
+		// 	Language:        pq.StringArray([]string{"English"}),
+		// 	Type:            pq.StringArray([]string{"Fantasy", "Comedy", "Family"}),
+		// 	MovieResolution: pq.StringArray([]string{"4K", "1080p", "720p"}),
+		// 	CastCrew: []models.CastAndCrew{
+		// 		{Type: "Cast", Name: "Jamie Lee Curtis", Character: "Mom", PhotoURL: "https://example.com/jamie_lee_curtis.jpg"},
+		// 		{Type: "Cast", Name: "Lindsay Lohan", Character: "Daughter", PhotoURL: "https://example.com/lindsay_lohan.jpg"},
+		// 		{Type: "Crew", Name: "Nisha Ganatra", Character: "Director", PhotoURL: "https://example.com/nisha_ganatra.jpg"},
+		// 	},
+		// 	Ranking: 8,
+		// 	Votes:   2100,
+		// 	Venues: []models.Venue{
+		// 		{
+		// 			Name:                 "Magic Mirror Cinema",
+		// 			Type:                 "Digital",
+		// 			Address:              "123 Elm Street, Los Angeles, CA",
+		// 			Latitude:             34.0522,
+		// 			Longitude:            -118.2437,
+		// 			Rows:                 20,
+		// 			Columns:              30,
+		// 			ScreenNumber:         5,
+		// 			MovieFormatSupported: pq.StringArray([]string{"Digital", "3D", "Dolby Atmos"}),
+		// 			LanguagesSupported:   pq.StringArray([]string{"English"}),
+		// 		},
+		// 	},
+		// }
+
+		// st := time.Date(releaseDate.Year(), releaseDate.Month(), releaseDate.Day(), 18, 30, 0, 0, time.UTC)
+		// et := st.Add(2*time.Hour - 30*time.Minute) // 2 hours duration
+
+		// _, status, err := m.AddMovie(movie, []models.MovieTimeSlot{
+		// 	{
+		// 		StartTime:   st,
+		// 		EndTime:     et,
+		// 		Duration:    int(et.Sub(st).Minutes()),
+		// 		Date:        releaseDate,
+		// 		MovieFormat: "Digital",
+		// 	},
+		// }, []models.SeatMatrix{
+		// 	{Row: 1, Column: 1, Price: 1200, SeatNumber: "A1", Type: "Gold"},
+		// 	{Row: 1, Column: 2, Price: 1200, SeatNumber: "A2", Type: "Gold"},
+		// 	{Row: 2, Column: 1, Price: 900, SeatNumber: "B1", Type: "Silver"},
+		// 	{Row: 2, Column: 2, Price: 900, SeatNumber: "B2", Type: "Silver"},
+		// })
+
+		// movie := models.Movie{
+		// 	Title:           "The Batman",
+		// 	Description:     "In his second year of fighting crime, Batman uncovers corruption in Gotham City while pursuing the Riddler, a sadistic serial killer.",
+		// 	ReleaseDate:     releaseDate,
+		// 	PosterURL:       "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/74xTEgt7R36Fpooo50r9T25onhq.jpg", // official poster
+		// 	Duration:        176,                                                                                   // minutes
+		// 	Language:        pq.StringArray([]string{"English"}),
+		// 	Type:            pq.StringArray([]string{"Action", "Crime", "Drama"}),
+		// 	MovieResolution: pq.StringArray([]string{"4K", "IMAX", "1080p"}),
+		// 	CastCrew: []models.CastAndCrew{
+		// 		{Type: "Cast", Name: "Robert Pattinson", Character: "Bruce Wayne / Batman", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/cK3cfcJvsAq3H8NwEyy3JdnJ7wX.jpg"},
+		// 		{Type: "Cast", Name: "Zoë Kravitz", Character: "Selina Kyle / Catwoman", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/5kW9xg2vTKXq2kfR1yX5y4J0x2S.jpg"},
+		// 		{Type: "Cast", Name: "Paul Dano", Character: "Edward Nashton / Riddler", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/7cxRWzi4LsVm4Utfpr1hfARNurT.jpg"},
+		// 		{Type: "Crew", Name: "Matt Reeves", Character: "Director", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/nloz3z6Uyt1v0fFNoXMlfgBFjHi.jpg"},
+		// 	},
+		// 	Ranking: 9,
+		// 	Votes:   5400,
+		// 	Venues: []models.Venue{
+		// 		{
+		// 			Name:                 "Gotham Grand Cinema",
+		// 			Type:                 "IMAX",
+		// 			Address:              "200 Wayne Tower, Gotham City",
+		// 			Latitude:             40.7128,
+		// 			Longitude:            -74.0060,
+		// 			Rows:                 25,
+		// 			Columns:              40,
+		// 			ScreenNumber:         8,
+		// 			MovieFormatSupported: pq.StringArray([]string{"IMAX", "4K", "Dolby Atmos"}),
+		// 			LanguagesSupported:   pq.StringArray([]string{"English", "Spanish"}),
+		// 		},
+		// 		{
+		// 			Name:                 "Arkham Multiplex",
+		// 			Type:                 "Digital",
+		// 			Address:              "500 Arkham Ave, Gotham City",
+		// 			Latitude:             40.7139,
+		// 			Longitude:            -74.0010,
+		// 			Rows:                 20,
+		// 			Columns:              30,
+		// 			ScreenNumber:         9,
+		// 			MovieFormatSupported: pq.StringArray([]string{"Digital", "3D"}),
+		// 			LanguagesSupported:   pq.StringArray([]string{"English"}),
+		// 		},
+		// 	},
+		// }
+
+		// // Create timeslots
+		// st1 := time.Date(releaseDate.Year(), releaseDate.Month(), releaseDate.Day(), 18, 30, 0, 0, time.UTC)
+		// et1 := st1.Add(2*time.Hour + 56*time.Minute) // 176 min runtime
+
+		// st2 := time.Date(releaseDate.Year(), releaseDate.Month(), releaseDate.Day(), 21, 30, 0, 0, time.UTC)
+		// et2 := st2.Add(2*time.Hour + 56*time.Minute)
+
+		// // Create time slots
+		// timeSlots := []models.MovieTimeSlot{
+		// 	{
+		// 		StartTime:   st1,
+		// 		EndTime:     et1,
+		// 		Duration:    int(et1.Sub(st1).Minutes()),
+		// 		Date:        releaseDate,
+		// 		MovieFormat: "IMAX",
+		// 	},
+		// 	{
+		// 		StartTime:   st2,
+		// 		EndTime:     et2,
+		// 		Duration:    int(et2.Sub(st2).Minutes()),
+		// 		Date:        releaseDate,
+		// 		MovieFormat: "Digital",
+		// 	},
+		// }
+
+		// // Create seat matrix
+		// seatMatrix := []models.SeatMatrix{
+		// 	{Row: 1, Column: 1, Price: 1200, SeatNumber: "A1", Type: "Gold"},
+		// 	{Row: 1, Column: 2, Price: 1200, SeatNumber: "A2", Type: "Gold"},
+		// 	{Row: 2, Column: 1, Price: 900, SeatNumber: "B1", Type: "Silver"},
+		// 	{Row: 2, Column: 2, Price: 900, SeatNumber: "B2", Type: "Silver"},
+		// }
+
+		// // Final call
+		// _, status, err := m.AddMovie(movie, timeSlots, seatMatrix)
+
+		// Set release date to today
+		// releaseDate := time.Now().UTC()
+
+		// movie := models.Movie{
+		// 	Title:           "Tron: Legacy",
+		// 	Description:     "The son of a virtual world designer goes looking for his father and ends up inside the digital world that his father designed, where he must stop a rogue program.",
+		// 	ReleaseDate:     releaseDate,
+		// 	PosterURL:       "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/vxJ08SvwomfKbpboCWynC3uqUg4.jpg", // Tron: Legacy poster
+		// 	Duration:        125,                                                                                   // minutes
+		// 	Language:        pq.StringArray([]string{"English"}),
+		// 	Type:            pq.StringArray([]string{"Action", "Adventure", "Sci-Fi"}),
+		// 	MovieResolution: pq.StringArray([]string{"IMAX", "3D", "1080p"}),
+		// 	CastCrew: []models.CastAndCrew{
+		// 		{Type: "Cast", Name: "Garrett Hedlund", Character: "Sam Flynn", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/kdtjWjk8Ut8KhmNidEsbgSnYGf1.jpg"},
+		// 		{Type: "Cast", Name: "Jeff Bridges", Character: "Kevin Flynn / Clu", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/h1coxnmyoErsKzJv61cDBgUU6UP.jpg"},
+		// 		{Type: "Cast", Name: "Olivia Wilde", Character: "Quorra", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/jNiij7Mgn7mjRSczzE0gJWlQ01T.jpg"},
+		// 		{Type: "Crew", Name: "Joseph Kosinski", Character: "Director", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/2m8JYxzXhYxXMEH8c1Y9K7xy4OY.jpg"},
+		// 	},
+		// 	Ranking: 8,
+		// 	Votes:   4100,
+		// 	Venues: []models.Venue{
+		// 		{
+		// 			Name:                 "Grid IMAX Theater",
+		// 			Type:                 "IMAX",
+		// 			Address:              "100 Flynn Arcade, Tron City",
+		// 			Latitude:             34.0522,
+		// 			Longitude:            -118.2437,
+		// 			Rows:                 20,
+		// 			Columns:              35,
+		// 			ScreenNumber:         5,
+		// 			MovieFormatSupported: pq.StringArray([]string{"IMAX", "3D", "Dolby Atmos"}),
+		// 			LanguagesSupported:   pq.StringArray([]string{"English"}),
+		// 		},
+		// 		{
+		// 			Name:                 "Encom Digital Multiplex",
+		// 			Type:                 "Digital",
+		// 			Address:              "300 Encom Tower, Tron City",
+		// 			Latitude:             34.0407,
+		// 			Longitude:            -118.2468,
+		// 			Rows:                 18,
+		// 			Columns:              25,
+		// 			ScreenNumber:         6,
+		// 			MovieFormatSupported: pq.StringArray([]string{"Digital", "3D"}),
+		// 			LanguagesSupported:   pq.StringArray([]string{"English"}),
+		// 		},
+		// 	},
+		// }
+
+		// // Create timeslots (today & tomorrow)
+		// st1 := time.Date(releaseDate.Year(), releaseDate.Month(), releaseDate.Day(), 17, 0, 0, 0, time.UTC)
+		// et1 := st1.Add(2*time.Hour + 5*time.Minute) // 125 min runtime
+
+		// st2 := time.Date(releaseDate.Year(), releaseDate.Month(), releaseDate.Day()+1, 20, 0, 0, 0, time.UTC)
+		// et2 := st2.Add(2*time.Hour + 5*time.Minute)
+
+		// timeSlots := []models.MovieTimeSlot{
+		// 	{
+		// 		StartTime:   st1,
+		// 		EndTime:     et1,
+		// 		Duration:    int(et1.Sub(st1).Minutes()),
+		// 		Date:        releaseDate,
+		// 		MovieFormat: "IMAX",
+		// 	},
+		// 	{
+		// 		StartTime:   st2,
+		// 		EndTime:     et2,
+		// 		Duration:    int(et2.Sub(st2).Minutes()),
+		// 		Date:        releaseDate.AddDate(0, 0, 1), // tomorrow
+		// 		MovieFormat: "Digital",
+		// 	},
+		// }
+
+		// // Create seat matrix
+		// seatMatrix := []models.SeatMatrix{
+		// 	{Row: 1, Column: 1, Price: 1000, SeatNumber: "A1", Type: "Gold"},
+		// 	{Row: 1, Column: 2, Price: 1000, SeatNumber: "A2", Type: "Gold"},
+		// 	{Row: 2, Column: 1, Price: 700, SeatNumber: "B1", Type: "Silver"},
+		// 	{Row: 2, Column: 2, Price: 700, SeatNumber: "B2", Type: "Silver"},
+		// }
+
+		releaseDate := time.Now().UTC() // today’s date
 
 		movie := models.Movie{
-			Title:           "Freakier Friday",
-			Description:     "A fantasy comedy sequel where the mother and daughter swap bodies again under magical—and unpredictable—circumstances.",
+			Title:           "Tron: Ares",
+			Description:     "A sequel to the Tron franchise, following a new digital adventure in the Grid led by Ares.",
 			ReleaseDate:     releaseDate,
-			PosterURL:       "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/your_poster_path.jpg", // replace with actual URL
-			Duration:        111,                                                                        // minutes
+			PosterURL:       "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/tron_ares_poster.jpg", // placeholder poster
+			Duration:        150,                                                                        // approx runtime
 			Language:        pq.StringArray([]string{"English"}),
-			Type:            pq.StringArray([]string{"Fantasy", "Comedy", "Family"}),
-			MovieResolution: pq.StringArray([]string{"4K", "1080p", "720p"}),
+			Type:            pq.StringArray([]string{"Sci-Fi", "Action", "Adventure"}),
+			MovieResolution: pq.StringArray([]string{"IMAX", "4K", "3D"}),
+
 			CastCrew: []models.CastAndCrew{
-				{Type: "Cast", Name: "Jamie Lee Curtis", Character: "Mom", PhotoURL: "https://example.com/jamie_lee_curtis.jpg"},
-				{Type: "Cast", Name: "Lindsay Lohan", Character: "Daughter", PhotoURL: "https://example.com/lindsay_lohan.jpg"},
-				{Type: "Crew", Name: "Nisha Ganatra", Character: "Director", PhotoURL: "https://example.com/nisha_ganatra.jpg"},
+				{Type: "Cast", Name: "Jared Leto", Character: "Ares", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/jared_leto.jpg"},
+				{Type: "Cast", Name: "Greta Lee", Character: "Unknown", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/greta_lee.jpg"},
+				{Type: "Crew", Name: "Joachim Rønning", Character: "Director", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/joachim_ronning.jpg"},
 			},
+
 			Ranking: 8,
 			Votes:   2100,
+
 			Venues: []models.Venue{
 				{
-					Name:                 "Magic Mirror Cinema",
-					Type:                 "Digital",
-					Address:              "123 Elm Street, Los Angeles, CA",
+					Name:                 "Neo Grid IMAX",
+					Type:                 "IMAX",
+					Address:              "42 Flynn’s Arcade, Grid City",
 					Latitude:             34.0522,
 					Longitude:            -118.2437,
-					Rows:                 20,
-					Columns:              30,
-					ScreenNumber:         5,
-					MovieFormatSupported: pq.StringArray([]string{"Digital", "3D", "Dolby Atmos"}),
+					Rows:                 30,
+					Columns:              45,
+					ScreenNumber:         19,
+					MovieFormatSupported: pq.StringArray([]string{"IMAX", "4K", "3D"}),
+					LanguagesSupported:   pq.StringArray([]string{"English", "Japanese"}),
+				},
+				{
+					Name:                 "Digital Arena",
+					Type:                 "Digital",
+					Address:              "99 ENCOM Tower, Grid City",
+					Latitude:             34.0532,
+					Longitude:            -118.2400,
+					Rows:                 25,
+					Columns:              35,
+					ScreenNumber:         20,
+					MovieFormatSupported: pq.StringArray([]string{"Digital", "Dolby Atmos"}),
 					LanguagesSupported:   pq.StringArray([]string{"English"}),
 				},
 			},
 		}
 
-		st := time.Date(releaseDate.Year(), releaseDate.Month(), releaseDate.Day(), 18, 30, 0, 0, time.UTC)
-		et := st.Add(2*time.Hour - 30*time.Minute) // 2 hours duration
+		// Time slots: today + tomorrow
+		st1 := time.Date(releaseDate.Year(), releaseDate.Month(), releaseDate.Day(), 19, 0, 0, 0, time.UTC)
+		et1 := st1.Add(2*time.Hour + 30*time.Minute)
 
-		_, status, err := m.AddMovie(movie, []models.MovieTimeSlot{
+		st2 := time.Date(releaseDate.Year(), releaseDate.Month(), releaseDate.Day()+1, 21, 0, 0, 0, time.UTC)
+		et2 := st2.Add(2*time.Hour + 30*time.Minute)
+
+		timeSlots := []models.MovieTimeSlot{
 			{
-				StartTime:   st,
-				EndTime:     et,
-				Duration:    int(et.Sub(st).Minutes()),
+				StartTime:   st1,
+				EndTime:     et1,
+				Duration:    int(et1.Sub(st1).Minutes()),
 				Date:        releaseDate,
+				MovieFormat: "IMAX",
+			},
+			{
+				StartTime:   st2,
+				EndTime:     et2,
+				Duration:    int(et2.Sub(st2).Minutes()),
+				Date:        releaseDate.AddDate(0, 0, 1), // tomorrow
 				MovieFormat: "Digital",
 			},
-		}, []models.SeatMatrix{
-			{Row: 1, Column: 1, Price: 1200, SeatNumber: "A1", Type: "Gold"},
-			{Row: 1, Column: 2, Price: 1200, SeatNumber: "A2", Type: "Gold"},
-			{Row: 2, Column: 1, Price: 900, SeatNumber: "B1", Type: "Silver"},
-			{Row: 2, Column: 2, Price: 900, SeatNumber: "B2", Type: "Silver"},
-		})
+		}
+
+		// Seat matrix
+		seatMatrix := []models.SeatMatrix{
+			{Row: 1, Column: 1, Price: 1500, SeatNumber: "A1", Type: "Platinum"},
+			{Row: 1, Column: 2, Price: 1500, SeatNumber: "A2", Type: "Platinum"},
+			{Row: 2, Column: 1, Price: 1000, SeatNumber: "B1", Type: "Gold"},
+			{Row: 2, Column: 2, Price: 1000, SeatNumber: "B2", Type: "Gold"},
+		}
+
+		// Final call
+		_, status, err := m.AddMovie(movie, timeSlots, seatMatrix)
 
 		if err != nil {
 			t.Error(err.Error())

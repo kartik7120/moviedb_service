@@ -136,17 +136,19 @@ func (m *MoviedbService) AddMovie(ctx context.Context, in *moviedb.Movie) (*movi
 	}
 
 	movie := models.Movie{
-		Title:           in.Title,
-		Description:     in.Description,
-		Duration:        int(in.Duration),
-		Language:        in.Language,
-		Type:            in.Type,
-		CastCrew:        castAndCrew,
-		PosterURL:       in.PosterUrl,
-		TrailerURL:      in.TrailerUrl,
-		ReleaseDate:     releaseDate,
-		MovieResolution: in.MovieResolution,
-		Venues:          venues,
+		Title:               in.Title,
+		Description:         in.Description,
+		Duration:            int(in.Duration),
+		Language:            in.Language,
+		Type:                in.Type,
+		CastCrew:            castAndCrew,
+		PosterURL:           in.PosterUrl,
+		TrailerURL:          in.TrailerUrl,
+		ReleaseDate:         releaseDate,
+		MovieResolution:     in.MovieResolution,
+		Venues:              venues,
+		ScreenWidePosterURL: in.ScreenWidePosterUrl,
+		LogoImageURL:        in.LogoImageURL,
 	}
 
 	_, status, err := m.MovieDB.AddMovie(movie, movieTimeSlots, seats)
@@ -273,16 +275,20 @@ func (m *MoviedbService) UpdateMovie(ctx context.Context, in *moviedb.Movie) (*m
 	}
 
 	movie := models.Movie{
-		Title:           in.Title,
-		Description:     in.Description,
-		Duration:        int(in.Duration),
-		Language:        in.Language,
-		Type:            in.Type,
-		CastCrew:        castAndCrew,
-		PosterURL:       in.PosterUrl,
-		TrailerURL:      in.TrailerUrl,
-		ReleaseDate:     releaseDate,
-		MovieResolution: in.MovieResolution,
+		Title:               in.Title,
+		Description:         in.Description,
+		Duration:            int(in.Duration),
+		Language:            in.Language,
+		Type:                in.Type,
+		CastCrew:            castAndCrew,
+		PosterURL:           in.PosterUrl,
+		TrailerURL:          in.TrailerUrl,
+		ReleaseDate:         releaseDate,
+		MovieResolution:     in.MovieResolution,
+		ScreenWidePosterURL: in.ScreenWidePosterUrl,
+		Ranking:             uint(in.Ranking),
+		Votes:               uint(in.Votes),
+		LogoImageURL:        in.LogoImageURL,
 	}
 
 	movieID := in.Id
@@ -596,19 +602,20 @@ func (m *MoviedbService) GetUpcomingMovies(ctx context.Context, in *moviedb.GetU
 		}
 		log.Info("movie id:", v.ID)
 		movielist = append(movielist, &moviedb.Movie{
-			Title:           v.Title,
-			Description:     v.Description,
-			Duration:        int32(v.Duration),
-			Language:        v.Language,
-			Type:            v.Type,
-			PosterUrl:       v.PosterURL,
-			TrailerUrl:      v.TrailerURL,
-			ReleaseDate:     v.ReleaseDate.Local().String(),
-			MovieResolution: v.MovieResolution,
-			Votes:           int64(v.Votes),
-			Ranking:         int32(v.Ranking),
-			CastCrew:        cast_and_crew_arr,
-			Id:              int32(v.ID),
+			Title:               v.Title,
+			Description:         v.Description,
+			Duration:            int32(v.Duration),
+			Language:            v.Language,
+			Type:                v.Type,
+			PosterUrl:           v.PosterURL,
+			TrailerUrl:          v.TrailerURL,
+			ReleaseDate:         v.ReleaseDate.Local().String(),
+			MovieResolution:     v.MovieResolution,
+			Votes:               int64(v.Votes),
+			Ranking:             int32(v.Ranking),
+			CastCrew:            cast_and_crew_arr,
+			Id:                  int32(v.ID),
+			ScreenWidePosterUrl: v.ScreenWidePosterURL,
 		})
 	}
 
@@ -665,19 +672,20 @@ func (m *MoviedbService) GetNowPlayingMovies(ctx context.Context, in *moviedb.Ge
 		}
 
 		movielist = append(movielist, &moviedb.Movie{
-			Title:           v.Title,
-			Description:     v.Description,
-			Duration:        int32(v.Duration),
-			Language:        v.Language,
-			Type:            v.Type,
-			PosterUrl:       v.PosterURL,
-			TrailerUrl:      v.TrailerURL,
-			ReleaseDate:     v.ReleaseDate.Local().String(),
-			MovieResolution: v.MovieResolution,
-			Votes:           int64(v.Votes),
-			Ranking:         int32(v.Ranking),
-			Id:              int32(v.ID),
-			CastCrew:        castAndCrew,
+			Title:               v.Title,
+			Description:         v.Description,
+			Duration:            int32(v.Duration),
+			Language:            v.Language,
+			Type:                v.Type,
+			PosterUrl:           v.PosterURL,
+			TrailerUrl:          v.TrailerURL,
+			ReleaseDate:         v.ReleaseDate.Local().String(),
+			MovieResolution:     v.MovieResolution,
+			Votes:               int64(v.Votes),
+			Ranking:             int32(v.Ranking),
+			Id:                  int32(v.ID),
+			CastCrew:            castAndCrew,
+			ScreenWidePosterUrl: v.ScreenWidePosterURL,
 		})
 	}
 
@@ -864,12 +872,12 @@ func (m *MoviedbService) GetMovieTimeSlots(ctx context.Context, in *moviedb.GetM
 		}, nil
 	}
 
-	if in.Latitude == 0 && in.Longitude == 0 {
-		return &moviedb.GetMovieTimeSlotResponse{
-			Status:  400,
-			Message: "No latitude or longitude provided",
-		}, nil
-	}
+	// if in.Latitude == 0 && in.Longitude == 0 {
+	// 	return &moviedb.GetMovieTimeSlotResponse{
+	// 		Status:  400,
+	// 		Message: "No latitude or longitude provided",
+	// 	}, nil
+	// }
 
 	venues, timeSlots, status, err := m.MovieDB.GetMovieTimeSlots(in.StartDate, in.EndDate, uint(movieID), in.Latitude, in.Longitude)
 

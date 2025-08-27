@@ -63,24 +63,26 @@ type MovieTimeSlot struct {
 
 // Movie model
 type Movie struct {
-	ID              uint `gorm:"primaryKey"`
-	CreatedAt       time.Time
-	UpdatedAt       time.Time
-	DeletedAt       gorm.DeletedAt `gorm:"index"`
-	Title           string         `json:"title" gorm:"not null;unique"`
-	Description     string         `json:"description" gorm:"not null"`
-	Duration        int            `json:"duration" gorm:"not null"`
-	Language        pq.StringArray `json:"language" gorm:"type:text[];not null"`
-	Type            pq.StringArray `json:"type" gorm:"type:text[];not null"`
-	CastCrew        []CastAndCrew  `json:"cast_crew" gorm:"foreignKey:MovieID"`
-	PosterURL       string         `json:"poster_url"`
-	TrailerURL      string         `json:"trailer_url"`
-	ReleaseDate     time.Time      `json:"release_date" gorm:"not null"`
-	MovieResolution pq.StringArray `json:"movie_resolution" gorm:"type:text[];not null"`
-	Venues          []Venue        `json:"venues" gorm:"many2many:movie_venues;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	Ranking         uint           `json:"ranking"`
-	Votes           uint           `json:"votes"`
-	Reviews         []Review       `json:"reviews" gorm:"foreignKey:MovieID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	ID                  uint `gorm:"primaryKey"`
+	CreatedAt           time.Time
+	UpdatedAt           time.Time
+	DeletedAt           gorm.DeletedAt `gorm:"index"`
+	Title               string         `json:"title" gorm:"not null;unique"`
+	Description         string         `json:"description" gorm:"not null"`
+	Duration            int            `json:"duration" gorm:"not null"`
+	Language            pq.StringArray `json:"language" gorm:"type:text[];not null"`
+	Type                pq.StringArray `json:"type" gorm:"type:text[];not null"`
+	CastCrew            []CastAndCrew  `json:"cast_crew" gorm:"foreignKey:MovieID"`
+	PosterURL           string         `json:"poster_url"`
+	TrailerURL          string         `json:"trailer_url"`
+	ReleaseDate         time.Time      `json:"release_date" gorm:"not null"`
+	MovieResolution     pq.StringArray `json:"movie_resolution" gorm:"type:text[];not null"`
+	Venues              []Venue        `json:"venues" gorm:"many2many:movie_venues;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Ranking             uint           `json:"ranking"`
+	Votes               uint           `json:"votes"`
+	Reviews             []Review       `json:"reviews" gorm:"foreignKey:MovieID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	ScreenWidePosterURL string         `json:"screen_wide_poster_url" gorm:"null,default:null"` // URL for a wide poster suitable for screens
+	LogoImageURL        string         `json:"logo_image_url" gorm:"null"`
 }
 
 // Venue model
