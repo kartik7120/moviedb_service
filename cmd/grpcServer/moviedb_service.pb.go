@@ -611,16 +611,17 @@ func (x *CastAndCrew) GetPhotourl() string {
 }
 
 type MovieTimeSlot struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	StartTime     string                 `protobuf:"bytes,1,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
-	EndTime       string                 `protobuf:"bytes,2,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
-	Duration      int32                  `protobuf:"varint,3,opt,name=duration,proto3" json:"duration,omitempty"`
-	Date          string                 `protobuf:"bytes,4,opt,name=date,proto3" json:"date,omitempty"`
-	MovieFormat   SeatType               `protobuf:"varint,5,opt,name=movie_format,json=movieFormat,proto3,enum=moviedb_service.SeatType" json:"movie_format,omitempty"`
-	Movieid       int32                  `protobuf:"varint,6,opt,name=movieid,proto3" json:"movieid,omitempty"`
-	Venueid       int32                  `protobuf:"varint,7,opt,name=venueid,proto3" json:"venueid,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	StartTime       string                 `protobuf:"bytes,1,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
+	EndTime         string                 `protobuf:"bytes,2,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
+	Duration        int32                  `protobuf:"varint,3,opt,name=duration,proto3" json:"duration,omitempty"`
+	Date            string                 `protobuf:"bytes,4,opt,name=date,proto3" json:"date,omitempty"`
+	MovieFormat     SeatType               `protobuf:"varint,5,opt,name=movie_format,json=movieFormat,proto3,enum=moviedb_service.SeatType" json:"movie_format,omitempty"`
+	Movieid         int32                  `protobuf:"varint,6,opt,name=movieid,proto3" json:"movieid,omitempty"`
+	Venueid         int32                  `protobuf:"varint,7,opt,name=venueid,proto3" json:"venueid,omitempty"`
+	MovieTimeSlotID int32                  `protobuf:"varint,8,opt,name=MovieTimeSlotID,proto3" json:"MovieTimeSlotID,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *MovieTimeSlot) Reset() {
@@ -698,6 +699,13 @@ func (x *MovieTimeSlot) GetMovieid() int32 {
 func (x *MovieTimeSlot) GetVenueid() int32 {
 	if x != nil {
 		return x.Venueid
+	}
+	return 0
+}
+
+func (x *MovieTimeSlot) GetMovieTimeSlotID() int32 {
+	if x != nil {
+		return x.MovieTimeSlotID
 	}
 	return 0
 }
@@ -3695,6 +3703,50 @@ func (x *CreateRequestResponse) GetError() string {
 	return ""
 }
 
+type GetMovieTimeSlotDetailsRequest struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	MovieTimeSlotId int32                  `protobuf:"varint,1,opt,name=movie_time_slot_id,json=movieTimeSlotId,proto3" json:"movie_time_slot_id,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *GetMovieTimeSlotDetailsRequest) Reset() {
+	*x = GetMovieTimeSlotDetailsRequest{}
+	mi := &file_moviedb_service_proto_msgTypes[49]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetMovieTimeSlotDetailsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetMovieTimeSlotDetailsRequest) ProtoMessage() {}
+
+func (x *GetMovieTimeSlotDetailsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_moviedb_service_proto_msgTypes[49]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetMovieTimeSlotDetailsRequest.ProtoReflect.Descriptor instead.
+func (*GetMovieTimeSlotDetailsRequest) Descriptor() ([]byte, []int) {
+	return file_moviedb_service_proto_rawDescGZIP(), []int{49}
+}
+
+func (x *GetMovieTimeSlotDetailsRequest) GetMovieTimeSlotId() int32 {
+	if x != nil {
+		return x.MovieTimeSlotId
+	}
+	return 0
+}
+
 var File_moviedb_service_proto protoreflect.FileDescriptor
 
 const file_moviedb_service_proto_rawDesc = "" +
@@ -3721,7 +3773,7 @@ const file_moviedb_service_proto_rawDesc = "" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x124\n" +
 	"\x04type\x18\x02 \x01(\x0e2 .moviedb_service.CastAndCrewTypeR\x04type\x12%\n" +
 	"\x0echaracter_name\x18\x03 \x01(\tR\rcharacterName\x12\x1a\n" +
-	"\bphotourl\x18\x04 \x01(\tR\bphotourl\"\xeb\x01\n" +
+	"\bphotourl\x18\x04 \x01(\tR\bphotourl\"\x95\x02\n" +
 	"\rMovieTimeSlot\x12\x1d\n" +
 	"\n" +
 	"start_time\x18\x01 \x01(\tR\tstartTime\x12\x19\n" +
@@ -3730,7 +3782,8 @@ const file_moviedb_service_proto_rawDesc = "" +
 	"\x04date\x18\x04 \x01(\tR\x04date\x12<\n" +
 	"\fmovie_format\x18\x05 \x01(\x0e2\x19.moviedb_service.SeatTypeR\vmovieFormat\x12\x18\n" +
 	"\amovieid\x18\x06 \x01(\x05R\amovieid\x12\x18\n" +
-	"\avenueid\x18\a \x01(\x05R\avenueid\"\xa3\x04\n" +
+	"\avenueid\x18\a \x01(\x05R\avenueid\x12(\n" +
+	"\x0fMovieTimeSlotID\x18\b \x01(\x05R\x0fMovieTimeSlotID\"\xa3\x04\n" +
 	"\x05Movie\x12\x14\n" +
 	"\x05title\x18\x01 \x01(\tR\x05title\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\x1a\n" +
@@ -3961,7 +4014,9 @@ const file_moviedb_service_proto_rawDesc = "" +
 	"\rtrasaction_id\x18\x02 \x01(\tR\ftrasactionId\"E\n" +
 	"\x15CreateRequestResponse\x12\x16\n" +
 	"\x06status\x18\x01 \x01(\x05R\x06status\x12\x14\n" +
-	"\x05error\x18\x02 \x01(\tR\x05error*C\n" +
+	"\x05error\x18\x02 \x01(\tR\x05error\"M\n" +
+	"\x1eGetMovieTimeSlotDetailsRequest\x12+\n" +
+	"\x12movie_time_slot_id\x18\x01 \x01(\x05R\x0fmovieTimeSlotId*C\n" +
 	"\bSeatType\x12\t\n" +
 	"\x05TWO_D\x10\x00\x12\v\n" +
 	"\aTHREE_D\x10\x01\x12\n" +
@@ -4013,7 +4068,7 @@ const file_moviedb_service_proto_rawDesc = "" +
 	"\bFilterBy\x12\n" +
 	"\n" +
 	"\x06RATING\x10\x00\x12\b\n" +
-	"\x04DATE\x10\x012\x9a\x17\n" +
+	"\x04DATE\x10\x012\xff\x17\n" +
 	"\x0eMovieDBService\x12B\n" +
 	"\bAddMovie\x12\x16.moviedb_service.Movie\x1a\x1e.moviedb_service.MovieResponse\x12I\n" +
 	"\bGetMovie\x12\x1d.moviedb_service.MovieRequest\x1a\x1e.moviedb_service.MovieResponse\x12J\n" +
@@ -4046,7 +4101,8 @@ const file_moviedb_service_proto_rawDesc = "" +
 	"\x0eGetBookedSeats\x12&.moviedb_service.GetBookedSeatsRequest\x1a'.moviedb_service.GetBookedSeatsResponse\x12\x93\x01\n" +
 	"\x1eIsValidToCommitSeatsForBooking\x127.moviedb_service.IsValidToCommitSeatsForBooking_Request\x1a8.moviedb_service.IsValidToCommitSeatsForBooking_Response\x12p\n" +
 	"\x0fLockBookedSeats\x12-.moviedb_service.GetBookedSeatsDetailsRequest\x1a..moviedb_service.GetBookedSeatsDetailsResponse\x12\\\n" +
-	"\fCreateTicket\x12$.moviedb_service.CreateTicketRequest\x1a&.moviedb_service.CreateRequestResponseBFZDgithub.com/kartik7120/booking_moviedb_service/cmd/grpcServer;moviedbb\x06proto3"
+	"\fCreateTicket\x12$.moviedb_service.CreateTicketRequest\x1a&.moviedb_service.CreateRequestResponse\x12c\n" +
+	"\x10GetMovieTimeSlot\x12/.moviedb_service.GetMovieTimeSlotDetailsRequest\x1a\x1e.moviedb_service.MovieTimeSlotBFZDgithub.com/kartik7120/booking_moviedb_service/cmd/grpcServer;moviedbb\x06proto3"
 
 var (
 	file_moviedb_service_proto_rawDescOnce sync.Once
@@ -4061,7 +4117,7 @@ func file_moviedb_service_proto_rawDescGZIP() []byte {
 }
 
 var file_moviedb_service_proto_enumTypes = make([]protoimpl.EnumInfo, 5)
-var file_moviedb_service_proto_msgTypes = make([]protoimpl.MessageInfo, 49)
+var file_moviedb_service_proto_msgTypes = make([]protoimpl.MessageInfo, 50)
 var file_moviedb_service_proto_goTypes = []any{
 	(SeatType)(0),                                   // 0: moviedb_service.SeatType
 	(CastAndCrewType)(0),                            // 1: moviedb_service.CastAndCrewType
@@ -4117,7 +4173,8 @@ var file_moviedb_service_proto_goTypes = []any{
 	(*IsValidToCommitSeatsForBooking_Response)(nil), // 51: moviedb_service.IsValidToCommitSeatsForBooking_Response
 	(*CreateTicketRequest)(nil),                     // 52: moviedb_service.CreateTicketRequest
 	(*CreateRequestResponse)(nil),                   // 53: moviedb_service.CreateRequestResponse
-	(*emptypb.Empty)(nil),                           // 54: google.protobuf.Empty
+	(*GetMovieTimeSlotDetailsRequest)(nil),          // 54: moviedb_service.GetMovieTimeSlotDetailsRequest
+	(*emptypb.Empty)(nil),                           // 55: google.protobuf.Empty
 }
 var file_moviedb_service_proto_depIdxs = []int32{
 	0,  // 0: moviedb_service.SeatMatrix.type:type_name -> moviedb_service.SeatType
@@ -4155,12 +4212,12 @@ var file_moviedb_service_proto_depIdxs = []int32{
 	43, // 32: moviedb_service.IsValidToCommitSeatsForBooking_Response.toBeBookedSeats:type_name -> moviedb_service.BookedSeats
 	10, // 33: moviedb_service.MovieDBService.AddMovie:input_type -> moviedb_service.Movie
 	13, // 34: moviedb_service.MovieDBService.GetMovie:input_type -> moviedb_service.MovieRequest
-	54, // 35: moviedb_service.MovieDBService.GetAllMovies:input_type -> google.protobuf.Empty
+	55, // 35: moviedb_service.MovieDBService.GetAllMovies:input_type -> google.protobuf.Empty
 	10, // 36: moviedb_service.MovieDBService.UpdateMovie:input_type -> moviedb_service.Movie
 	13, // 37: moviedb_service.MovieDBService.DeleteMovie:input_type -> moviedb_service.MovieRequest
 	11, // 38: moviedb_service.MovieDBService.AddVenue:input_type -> moviedb_service.Venue
 	13, // 39: moviedb_service.MovieDBService.GetVenue:input_type -> moviedb_service.MovieRequest
-	54, // 40: moviedb_service.MovieDBService.GetAllVenues:input_type -> google.protobuf.Empty
+	55, // 40: moviedb_service.MovieDBService.GetAllVenues:input_type -> google.protobuf.Empty
 	11, // 41: moviedb_service.MovieDBService.UpdateVenue:input_type -> moviedb_service.Venue
 	13, // 42: moviedb_service.MovieDBService.DeleteVenue:input_type -> moviedb_service.MovieRequest
 	17, // 43: moviedb_service.MovieDBService.GetUpcomingMovies:input_type -> moviedb_service.GetUpcomingMovieRequest
@@ -4185,40 +4242,42 @@ var file_moviedb_service_proto_depIdxs = []int32{
 	50, // 62: moviedb_service.MovieDBService.IsValidToCommitSeatsForBooking:input_type -> moviedb_service.IsValidToCommitSeatsForBooking_Request
 	48, // 63: moviedb_service.MovieDBService.LockBookedSeats:input_type -> moviedb_service.GetBookedSeatsDetailsRequest
 	52, // 64: moviedb_service.MovieDBService.CreateTicket:input_type -> moviedb_service.CreateTicketRequest
-	14, // 65: moviedb_service.MovieDBService.AddMovie:output_type -> moviedb_service.MovieResponse
-	14, // 66: moviedb_service.MovieDBService.GetMovie:output_type -> moviedb_service.MovieResponse
-	15, // 67: moviedb_service.MovieDBService.GetAllMovies:output_type -> moviedb_service.MovieListResponse
-	14, // 68: moviedb_service.MovieDBService.UpdateMovie:output_type -> moviedb_service.MovieResponse
-	14, // 69: moviedb_service.MovieDBService.DeleteMovie:output_type -> moviedb_service.MovieResponse
-	16, // 70: moviedb_service.MovieDBService.AddVenue:output_type -> moviedb_service.VenueResponse
-	16, // 71: moviedb_service.MovieDBService.GetVenue:output_type -> moviedb_service.VenueResponse
-	15, // 72: moviedb_service.MovieDBService.GetAllVenues:output_type -> moviedb_service.MovieListResponse
-	16, // 73: moviedb_service.MovieDBService.UpdateVenue:output_type -> moviedb_service.VenueResponse
-	14, // 74: moviedb_service.MovieDBService.DeleteVenue:output_type -> moviedb_service.MovieResponse
-	18, // 75: moviedb_service.MovieDBService.GetUpcomingMovies:output_type -> moviedb_service.GetUpcomingMovieResponse
-	18, // 76: moviedb_service.MovieDBService.GetNowPlayingMovies:output_type -> moviedb_service.GetUpcomingMovieResponse
-	22, // 77: moviedb_service.MovieDBService.AddReview:output_type -> moviedb_service.ReviewResponse
-	22, // 78: moviedb_service.MovieDBService.GetReview:output_type -> moviedb_service.ReviewResponse
-	22, // 79: moviedb_service.MovieDBService.UpdateReview:output_type -> moviedb_service.ReviewResponse
-	22, // 80: moviedb_service.MovieDBService.DeleteReview:output_type -> moviedb_service.ReviewResponse
-	25, // 81: moviedb_service.MovieDBService.GetAllMovieReviews:output_type -> moviedb_service.ReviewListResponse
-	28, // 82: moviedb_service.MovieDBService.GetMovieTimeSlots:output_type -> moviedb_service.GetMovieTimeSlotResponse
-	29, // 83: moviedb_service.MovieDBService.AddMovieTimeSlot:output_type -> moviedb_service.MovieTimeSlotResponse
-	30, // 84: moviedb_service.MovieDBService.UpdateMovieTimeSlot:output_type -> moviedb_service.MovieTimeSlotUpdateResponse
-	29, // 85: moviedb_service.MovieDBService.DeleteMovieTimeSlot:output_type -> moviedb_service.MovieTimeSlotResponse
-	7,  // 86: moviedb_service.MovieDBService.AddSeatMatrix:output_type -> moviedb_service.AddSeatMatrixResponse
-	42, // 87: moviedb_service.MovieDBService.AddSingleSeatMatrix:output_type -> moviedb_service.AddSingleSeatMatrixResponse
-	34, // 88: moviedb_service.MovieDBService.GetSeatMatrix:output_type -> moviedb_service.GetSeatMatrixResponse
-	36, // 89: moviedb_service.MovieDBService.UpdateSeatMatrix:output_type -> moviedb_service.UpdateSeatMatrixResponse
-	38, // 90: moviedb_service.MovieDBService.DeleteSeatMatrix:output_type -> moviedb_service.DeleteSeatMatrixResponse
-	40, // 91: moviedb_service.MovieDBService.DeleteEntireSeatMatrix:output_type -> moviedb_service.DeleteEntireSeatMatrixResponse
-	45, // 92: moviedb_service.MovieDBService.BookSeats:output_type -> moviedb_service.BookSeatsResponse
-	47, // 93: moviedb_service.MovieDBService.GetBookedSeats:output_type -> moviedb_service.GetBookedSeatsResponse
-	51, // 94: moviedb_service.MovieDBService.IsValidToCommitSeatsForBooking:output_type -> moviedb_service.IsValidToCommitSeatsForBooking_Response
-	49, // 95: moviedb_service.MovieDBService.LockBookedSeats:output_type -> moviedb_service.GetBookedSeatsDetailsResponse
-	53, // 96: moviedb_service.MovieDBService.CreateTicket:output_type -> moviedb_service.CreateRequestResponse
-	65, // [65:97] is the sub-list for method output_type
-	33, // [33:65] is the sub-list for method input_type
+	54, // 65: moviedb_service.MovieDBService.GetMovieTimeSlot:input_type -> moviedb_service.GetMovieTimeSlotDetailsRequest
+	14, // 66: moviedb_service.MovieDBService.AddMovie:output_type -> moviedb_service.MovieResponse
+	14, // 67: moviedb_service.MovieDBService.GetMovie:output_type -> moviedb_service.MovieResponse
+	15, // 68: moviedb_service.MovieDBService.GetAllMovies:output_type -> moviedb_service.MovieListResponse
+	14, // 69: moviedb_service.MovieDBService.UpdateMovie:output_type -> moviedb_service.MovieResponse
+	14, // 70: moviedb_service.MovieDBService.DeleteMovie:output_type -> moviedb_service.MovieResponse
+	16, // 71: moviedb_service.MovieDBService.AddVenue:output_type -> moviedb_service.VenueResponse
+	16, // 72: moviedb_service.MovieDBService.GetVenue:output_type -> moviedb_service.VenueResponse
+	15, // 73: moviedb_service.MovieDBService.GetAllVenues:output_type -> moviedb_service.MovieListResponse
+	16, // 74: moviedb_service.MovieDBService.UpdateVenue:output_type -> moviedb_service.VenueResponse
+	14, // 75: moviedb_service.MovieDBService.DeleteVenue:output_type -> moviedb_service.MovieResponse
+	18, // 76: moviedb_service.MovieDBService.GetUpcomingMovies:output_type -> moviedb_service.GetUpcomingMovieResponse
+	18, // 77: moviedb_service.MovieDBService.GetNowPlayingMovies:output_type -> moviedb_service.GetUpcomingMovieResponse
+	22, // 78: moviedb_service.MovieDBService.AddReview:output_type -> moviedb_service.ReviewResponse
+	22, // 79: moviedb_service.MovieDBService.GetReview:output_type -> moviedb_service.ReviewResponse
+	22, // 80: moviedb_service.MovieDBService.UpdateReview:output_type -> moviedb_service.ReviewResponse
+	22, // 81: moviedb_service.MovieDBService.DeleteReview:output_type -> moviedb_service.ReviewResponse
+	25, // 82: moviedb_service.MovieDBService.GetAllMovieReviews:output_type -> moviedb_service.ReviewListResponse
+	28, // 83: moviedb_service.MovieDBService.GetMovieTimeSlots:output_type -> moviedb_service.GetMovieTimeSlotResponse
+	29, // 84: moviedb_service.MovieDBService.AddMovieTimeSlot:output_type -> moviedb_service.MovieTimeSlotResponse
+	30, // 85: moviedb_service.MovieDBService.UpdateMovieTimeSlot:output_type -> moviedb_service.MovieTimeSlotUpdateResponse
+	29, // 86: moviedb_service.MovieDBService.DeleteMovieTimeSlot:output_type -> moviedb_service.MovieTimeSlotResponse
+	7,  // 87: moviedb_service.MovieDBService.AddSeatMatrix:output_type -> moviedb_service.AddSeatMatrixResponse
+	42, // 88: moviedb_service.MovieDBService.AddSingleSeatMatrix:output_type -> moviedb_service.AddSingleSeatMatrixResponse
+	34, // 89: moviedb_service.MovieDBService.GetSeatMatrix:output_type -> moviedb_service.GetSeatMatrixResponse
+	36, // 90: moviedb_service.MovieDBService.UpdateSeatMatrix:output_type -> moviedb_service.UpdateSeatMatrixResponse
+	38, // 91: moviedb_service.MovieDBService.DeleteSeatMatrix:output_type -> moviedb_service.DeleteSeatMatrixResponse
+	40, // 92: moviedb_service.MovieDBService.DeleteEntireSeatMatrix:output_type -> moviedb_service.DeleteEntireSeatMatrixResponse
+	45, // 93: moviedb_service.MovieDBService.BookSeats:output_type -> moviedb_service.BookSeatsResponse
+	47, // 94: moviedb_service.MovieDBService.GetBookedSeats:output_type -> moviedb_service.GetBookedSeatsResponse
+	51, // 95: moviedb_service.MovieDBService.IsValidToCommitSeatsForBooking:output_type -> moviedb_service.IsValidToCommitSeatsForBooking_Response
+	49, // 96: moviedb_service.MovieDBService.LockBookedSeats:output_type -> moviedb_service.GetBookedSeatsDetailsResponse
+	53, // 97: moviedb_service.MovieDBService.CreateTicket:output_type -> moviedb_service.CreateRequestResponse
+	9,  // 98: moviedb_service.MovieDBService.GetMovieTimeSlot:output_type -> moviedb_service.MovieTimeSlot
+	66, // [66:99] is the sub-list for method output_type
+	33, // [33:66] is the sub-list for method input_type
 	33, // [33:33] is the sub-list for extension type_name
 	33, // [33:33] is the sub-list for extension extendee
 	0,  // [0:33] is the sub-list for field type_name
@@ -4235,7 +4294,7 @@ func file_moviedb_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_moviedb_service_proto_rawDesc), len(file_moviedb_service_proto_rawDesc)),
 			NumEnums:      5,
-			NumMessages:   49,
+			NumMessages:   50,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

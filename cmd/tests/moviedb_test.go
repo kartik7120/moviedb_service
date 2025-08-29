@@ -1155,6 +1155,74 @@ func TestMovieDB(t *testing.T) {
 		}
 	})
 
+	t.Run("Add movie time slot", func(t *testing.T) {
+		if testing.Short() {
+			t.Skip("Skipping this test in short mode")
+		}
+
+		err := godotenv.Load()
+
+		if err != nil {
+			t.Errorf("Could not load .env file")
+		}
+
+		m := api.NewMovieDB()
+
+		// connect to database
+
+		conn, err := helper.ConnectToDB()
+
+		if err != nil {
+			t.Errorf("unable to connect to database")
+		}
+
+		m.DB.Conn = conn
+
+		_, err = time.Parse("2006-01-02", "2022-03-04")
+
+		if err != nil {
+			t.Errorf("error parsing release date")
+			return
+		}
+
+		releaseDate := time.Now().UTC() // today’s date
+
+		st1 := time.Date(releaseDate.Year(), releaseDate.Month(), releaseDate.Day(), 19, 0, 0, 0, time.UTC)
+		et1 := st1.Add(2*time.Hour + 30*time.Minute)
+
+		st2 := time.Date(releaseDate.Year(), releaseDate.Month(), releaseDate.Day()+1, 21, 0, 0, 0, time.UTC)
+		et2 := st2.Add(2*time.Hour + 30*time.Minute)
+
+		timeSlots := []models.MovieTimeSlot{
+			{
+				StartTime:   st1,
+				EndTime:     et1,
+				Duration:    int(et1.Sub(st1).Minutes()),
+				Date:        releaseDate,
+				MovieFormat: "IMAX",
+				MovieID:     18,
+				VenueID:     27,
+			},
+			{
+				StartTime:   st2,
+				EndTime:     et2,
+				Duration:    int(et2.Sub(st2).Minutes()),
+				Date:        releaseDate.AddDate(0, 0, 1), // tomorrow
+				MovieFormat: "Digital",
+				MovieID:     18,
+				VenueID:     26,
+			},
+		}
+
+		result := m.DB.Conn.Model(models.MovieTimeSlot{}).Create(timeSlots)
+
+		if result.Error != nil {
+			t.Error(result.Error)
+			return
+		}
+
+	})
+
 	t.Run("Add venue along side movies in database", func(t *testing.T) {
 
 		err := godotenv.Load()

@@ -52,6 +52,7 @@ const (
 	MovieDBService_IsValidToCommitSeatsForBooking_FullMethodName = "/moviedb_service.MovieDBService/IsValidToCommitSeatsForBooking"
 	MovieDBService_LockBookedSeats_FullMethodName                = "/moviedb_service.MovieDBService/LockBookedSeats"
 	MovieDBService_CreateTicket_FullMethodName                   = "/moviedb_service.MovieDBService/CreateTicket"
+	MovieDBService_GetMovieTimeSlot_FullMethodName               = "/moviedb_service.MovieDBService/GetMovieTimeSlot"
 )
 
 // MovieDBServiceClient is the client API for MovieDBService service.
@@ -91,6 +92,7 @@ type MovieDBServiceClient interface {
 	IsValidToCommitSeatsForBooking(ctx context.Context, in *IsValidToCommitSeatsForBooking_Request, opts ...grpc.CallOption) (*IsValidToCommitSeatsForBooking_Response, error)
 	LockBookedSeats(ctx context.Context, in *GetBookedSeatsDetailsRequest, opts ...grpc.CallOption) (*GetBookedSeatsDetailsResponse, error)
 	CreateTicket(ctx context.Context, in *CreateTicketRequest, opts ...grpc.CallOption) (*CreateRequestResponse, error)
+	GetMovieTimeSlot(ctx context.Context, in *GetMovieTimeSlotDetailsRequest, opts ...grpc.CallOption) (*MovieTimeSlot, error)
 }
 
 type movieDBServiceClient struct {
@@ -421,6 +423,16 @@ func (c *movieDBServiceClient) CreateTicket(ctx context.Context, in *CreateTicke
 	return out, nil
 }
 
+func (c *movieDBServiceClient) GetMovieTimeSlot(ctx context.Context, in *GetMovieTimeSlotDetailsRequest, opts ...grpc.CallOption) (*MovieTimeSlot, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MovieTimeSlot)
+	err := c.cc.Invoke(ctx, MovieDBService_GetMovieTimeSlot_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MovieDBServiceServer is the server API for MovieDBService service.
 // All implementations must embed UnimplementedMovieDBServiceServer
 // for forward compatibility.
@@ -458,6 +470,7 @@ type MovieDBServiceServer interface {
 	IsValidToCommitSeatsForBooking(context.Context, *IsValidToCommitSeatsForBooking_Request) (*IsValidToCommitSeatsForBooking_Response, error)
 	LockBookedSeats(context.Context, *GetBookedSeatsDetailsRequest) (*GetBookedSeatsDetailsResponse, error)
 	CreateTicket(context.Context, *CreateTicketRequest) (*CreateRequestResponse, error)
+	GetMovieTimeSlot(context.Context, *GetMovieTimeSlotDetailsRequest) (*MovieTimeSlot, error)
 	mustEmbedUnimplementedMovieDBServiceServer()
 }
 
@@ -563,6 +576,9 @@ func (UnimplementedMovieDBServiceServer) LockBookedSeats(context.Context, *GetBo
 }
 func (UnimplementedMovieDBServiceServer) CreateTicket(context.Context, *CreateTicketRequest) (*CreateRequestResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateTicket not implemented")
+}
+func (UnimplementedMovieDBServiceServer) GetMovieTimeSlot(context.Context, *GetMovieTimeSlotDetailsRequest) (*MovieTimeSlot, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMovieTimeSlot not implemented")
 }
 func (UnimplementedMovieDBServiceServer) mustEmbedUnimplementedMovieDBServiceServer() {}
 func (UnimplementedMovieDBServiceServer) testEmbeddedByValue()                        {}
@@ -1161,6 +1177,24 @@ func _MovieDBService_CreateTicket_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MovieDBService_GetMovieTimeSlot_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMovieTimeSlotDetailsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MovieDBServiceServer).GetMovieTimeSlot(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MovieDBService_GetMovieTimeSlot_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MovieDBServiceServer).GetMovieTimeSlot(ctx, req.(*GetMovieTimeSlotDetailsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // MovieDBService_ServiceDesc is the grpc.ServiceDesc for MovieDBService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1295,6 +1329,10 @@ var MovieDBService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateTicket",
 			Handler:    _MovieDBService_CreateTicket_Handler,
+		},
+		{
+			MethodName: "GetMovieTimeSlot",
+			Handler:    _MovieDBService_GetMovieTimeSlot_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

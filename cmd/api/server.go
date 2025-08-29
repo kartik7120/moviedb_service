@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strconv"
 	"time"
@@ -916,13 +917,14 @@ func (m *MoviedbService) GetMovieTimeSlots(ctx context.Context, in *moviedb.GetM
 		dt := fmt.Sprintf("%s", y+"-"+m+"-"+d)
 
 		timeSlotList = append(timeSlotList, &moviedb.MovieTimeSlot{
-			StartTime:   st,
-			EndTime:     ed,
-			Date:        dt,
-			Duration:    int32(v.Duration),
-			MovieFormat: movieFormat,
-			Venueid:     int32(v.VenueID),
-			Movieid:     int32(v.MovieID),
+			StartTime:       st,
+			EndTime:         ed,
+			Date:            dt,
+			Duration:        int32(v.Duration),
+			MovieFormat:     movieFormat,
+			Venueid:         int32(v.VenueID),
+			Movieid:         int32(v.MovieID),
+			MovieTimeSlotID: int32(v.ID),
 		})
 	}
 
@@ -1455,4 +1457,36 @@ func (m *MoviedbService) CreateTicket(ctx context.Context, in *moviedb.CreateTic
 		Status: 200,
 		Error:  "",
 	}, nil
+}
+
+func (m *MoviedbService) GetMovieTimeSlot(ctx context.Context, in *moviedb.GetMovieTimeSlotDetailsRequest) (*moviedb.MovieTimeSlot, error) {
+
+	if in.MovieTimeSlotId == 0 {
+		return nil, errors.New("movie time slot id cannot be zero")
+	}
+
+	movieTimeSlot, err := m.MovieDB.GetMovieTimeSlot(in.MovieTimeSlotId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var res moviedb.MovieTimeSlot
+
+	if movieTimeSlot.MovieFormat == "4D" {
+		res.MovieFormat = moviedb.SeatType_FOUR_D
+	} else if movieTimeSlot.MovieFormat == "3D" {
+		res.MovieFormat = moviedb.SeatType_THREE_D
+	} else {
+		res.MovieFormat = moviedb.SeatType_TWO_D
+	}
+
+	res.StartTime = movieTimeSlot.StartTime.GoString()
+	res.EndTime = movieTimeSlot.EndTime.GoString()
+	res.Duration = int32(movieTimeSlot.Duration)
+	res.Date = movieTimeSlot.Date.GoString()
+	res.Movieid = int32(movieTimeSlot.MovieID)
+	res.Venueid = int32(movieTimeSlot.VenueID)
+
+	return &res, nil
 }

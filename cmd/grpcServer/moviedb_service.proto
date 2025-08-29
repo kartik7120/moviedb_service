@@ -78,6 +78,7 @@ message MovieTimeSlot {
     SeatType movie_format = 5;
     int32 movieid = 6;
     int32 venueid = 7;
+    int32 MovieTimeSlotID = 8;
 }
 
 message Movie {
@@ -412,6 +413,10 @@ message CreateRequestResponse {
     string error = 2;
 }
 
+message GetMovieTimeSlotDetailsRequest  {
+    int32 movie_time_slot_id = 1;
+}
+
 service MovieDBService {
     rpc AddMovie (Movie) returns (MovieResponse);
     rpc GetMovie (MovieRequest) returns (MovieResponse);
@@ -446,4 +451,5 @@ service MovieDBService {
     rpc IsValidToCommitSeatsForBooking(IsValidToCommitSeatsForBooking_Request) returns (IsValidToCommitSeatsForBooking_Response);
     rpc LockBookedSeats(GetBookedSeatsDetailsRequest) returns (GetBookedSeatsDetailsResponse);
     rpc CreateTicket(CreateTicketRequest) returns (CreateRequestResponse);
+    rpc GetMovieTimeSlot(GetMovieTimeSlotDetailsRequest) returns (MovieTimeSlot);
 }

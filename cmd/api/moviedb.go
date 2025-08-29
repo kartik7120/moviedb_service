@@ -1224,3 +1224,16 @@ func (m *MovieDB) CreateTicket(idempotent_key string, transaction_id string) (in
 
 	return 200, nil
 }
+
+func (m *MovieDB) GetMovieTimeSlot(movie_time_slot_id int32) (*models.MovieTimeSlot, error) {
+	var movieTimeSlot models.MovieTimeSlot
+
+	result := m.DB.Conn.Model(models.MovieTimeSlot{}).Where("id = ?", movie_time_slot_id).Find(&movieTimeSlot)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &movieTimeSlot, nil
+
+}
