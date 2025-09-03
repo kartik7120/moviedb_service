@@ -1200,8 +1200,8 @@ func TestMovieDB(t *testing.T) {
 				Duration:    int(et1.Sub(st1).Minutes()),
 				Date:        releaseDate,
 				MovieFormat: "IMAX",
-				MovieID:     18,
-				VenueID:     27,
+				MovieID:     1,
+				VenueID:     1,
 			},
 			{
 				StartTime:   st2,
@@ -1209,8 +1209,8 @@ func TestMovieDB(t *testing.T) {
 				Duration:    int(et2.Sub(st2).Minutes()),
 				Date:        releaseDate.AddDate(0, 0, 1), // tomorrow
 				MovieFormat: "Digital",
-				MovieID:     18,
-				VenueID:     26,
+				MovieID:     1,
+				VenueID:     1,
 			},
 		}
 
@@ -1284,6 +1284,39 @@ func TestMovieDB(t *testing.T) {
 
 	})
 
+	t.Run("Add seats in venue", func(t *testing.T) {
+		seatMatrix := []models.SeatMatrix{
+			{Row: 1, Column: 1, Price: 1500, SeatNumber: "A1", Type: "Platinum", VenueID: 1},
+			{Row: 1, Column: 2, Price: 1500, SeatNumber: "A2", Type: "Platinum", VenueID: 1},
+			{Row: 2, Column: 1, Price: 1000, SeatNumber: "B1", Type: "Gold", VenueID: 1},
+			{Row: 2, Column: 2, Price: 1000, SeatNumber: "B2", Type: "Gold", VenueID: 1},
+		}
+
+		err := godotenv.Load()
+
+		if err != nil {
+			t.Fatal("error loading .env file", err)
+			return
+		}
+
+		m := api.NewMovieDB()
+
+		conn, err := helper.ConnectToDB()
+
+		if err != nil {
+			t.Fatal("error connecting to database", err)
+			return
+		}
+
+		m.DB.Conn = conn
+
+		result := m.DB.Conn.Model(&models.SeatMatrix{}).Create(seatMatrix)
+
+		if result.Error != nil {
+			t.Errorf("error creating seat matrix: %v", result.Error.Error())
+		}
+	})
+
 	t.Run("Code to migrate the database", func(t *testing.T) {
 		if testing.Short() {
 			t.Skip("Skipping this test in short mode")
@@ -1307,8 +1340,8 @@ func TestMovieDB(t *testing.T) {
 
 		m.DB.Conn = conn
 
-		// m.DB.Conn.AutoMigrate(&models.BookedSeats{}, &models.MovieTimeSlot{}, &models.CastAndCrew{}, &models.Review{}, &models.Venue{}, &models.SeatMatrix{}, &models.Movie{}, &models.User{}, &models.Idempotent{})
+		// m.DB.Conn.AutoMigrate(&models.BookedSeats{}, &models.MovieTimeSlot{}, &models.CastAndCrew{}, &models.Review{}, &models.Venue{}, &models.SeatMatrix{}, &models.Movie{}, &models.User{}, &models.Idempotent{}, &models.CastAndCrew{}, &models.Review{}, &models.Ticket{}, &models.User{})
 
-		m.DB.Conn.AutoMigrate(&models.Movie{})
+		m.DB.Conn.AutoMigrate(&models.Idempotent{})
 	})
 }

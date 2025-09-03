@@ -231,7 +231,7 @@ func (m *MoviedbService) GetMovie(ctx context.Context, in *moviedb.MovieRequest)
 			Type:            movie.Type,
 			CastCrew:        castCrew,
 			PosterUrl:       movie.PosterURL,
-			ReleaseDate:     movie.ReleaseDate.GoString(),
+			ReleaseDate:     movie.ReleaseDate.Format("2006-01-02"),
 			TrailerUrl:      movie.TrailerURL,
 			MovieResolution: movie.MovieResolution,
 			Id:              int32(movie.ID),
@@ -1481,10 +1481,12 @@ func (m *MoviedbService) GetMovieTimeSlot(ctx context.Context, in *moviedb.GetMo
 		res.MovieFormat = moviedb.SeatType_TWO_D
 	}
 
-	res.StartTime = movieTimeSlot.StartTime.GoString()
-	res.EndTime = movieTimeSlot.EndTime.GoString()
+	layout := "2006-01-02"
+
+	res.StartTime = movieTimeSlot.StartTime.Format("15:04:05")
+	res.EndTime = movieTimeSlot.EndTime.Format("15:04:05")
+	res.Date = movieTimeSlot.Date.Format(layout)
 	res.Duration = int32(movieTimeSlot.Duration)
-	res.Date = movieTimeSlot.Date.GoString()
 	res.Movieid = int32(movieTimeSlot.MovieID)
 	res.Venueid = int32(movieTimeSlot.VenueID)
 
