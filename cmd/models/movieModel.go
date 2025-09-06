@@ -26,7 +26,7 @@ type SeatMatrix struct {
 	Type       string `json:"type"`
 }
 
-// BookedSeats to track booked seats
+// BookedSeats to track booked seats, booked seat as the copy of the instance of the seat matrix of a particular venue. No changes regarding booked or not to be made in the original, only the copy
 type BookedSeats struct {
 	gorm.Model
 	SeatNumber      string     `json:"seat_number" gorm:"not null;uniqueIndex:idx_unique_booked_seats"`
