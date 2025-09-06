@@ -798,6 +798,11 @@ func (m *MovieDB) AddMovieTimeSlot(movieTimeSlot models.MovieTimeSlot) (models.M
 
 	result = m.DB.Conn.Where("venue_id = ?", movieTimeSlot.VenueID).Find(&seatMatrix)
 
+	if result.Error != nil {
+		fmt.Println("error finding seat matrix of a particular venue")
+		return movieTimeSlot, 500, result.Error
+	}
+
 	var bookedSeats []models.BookedSeats
 
 	for _, seat := range seatMatrix {

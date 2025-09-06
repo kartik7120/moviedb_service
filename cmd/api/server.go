@@ -1419,7 +1419,7 @@ func (m *MoviedbService) IsValidToCommitSeatsForBooking(ctx context.Context, in 
 // Lock the seats when seats are selected and before payment confirmation
 // This prevents other users from booking the same seats while the payment is being processed.
 // The seats will be locked for a short duration (e.g., 10 minutes) to allow the user to complete the payment.
-func (m *MoviedbService) LockSeatsForBooking(ctx context.Context, in *moviedb.GetBookedSeatsDetailsRequest) (*moviedb.GetBookedSeatsDetailsResponse, error) {
+func (m *MoviedbService) LockBookedSeats(ctx context.Context, in *moviedb.GetBookedSeatsDetailsRequest) (*moviedb.GetBookedSeatsDetailsResponse, error) {
 	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 
