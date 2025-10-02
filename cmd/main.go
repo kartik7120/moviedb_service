@@ -62,7 +62,7 @@ func main() {
 	conn, err := amqp091.Dial("amqp://guest:guest@localhost:5672/")
 
 	if err != nil {
-		log.Error("error connecting to to rabbitmq")
+		log.Error("error connecting to to rabbitmq", err.Error())
 		os.Exit(1)
 		return
 	}

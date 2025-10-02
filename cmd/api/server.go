@@ -1300,6 +1300,9 @@ func (m *MoviedbService) BookSeats(ctx context.Context, in *moviedb.BookSeatsReq
 	status, err := m.MovieDB.BookSeats(in.MovieTimeSlotId, in.Email, in.PhoneNumber, seats)
 
 	if status != 200 || err != nil {
+
+		fmt.Println("error booking seats in BookSeats function :", err.Error())
+
 		return &moviedb.BookSeatsResponse{
 			Status:  int32(status),
 			Message: "error booking seats",
@@ -1349,6 +1352,37 @@ func (m *MoviedbService) GetBookedSeats(ctx context.Context, in *moviedb.GetBook
 		Error:       "",
 		BookedSeats: seats,
 	}, nil
+}
+
+func (m *MoviedbService) GetTicketDetails(ctx context.Context, in *moviedb.GetTicketDetailsRequest) (*moviedb.GetTicketDetailsResponse, error) {
+	ctx, cancel := context.WithTimeout(ctx, time.Second*5)
+	defer cancel()
+
+	done := make(chan bool)
+	var response *moviedb.GetTicketDetailsResponse
+	var errorInTicketIDFunc error
+	go func() {
+		resp, err := m.MovieDB.GetTicketID(in.TicketID)
+		if err != nil {
+			fmt.Println("error calling the get ticket details function: ", err)
+			errorInTicketIDFunc = err
+		} else {
+			response = resp
+		}
+		done <- true
+	}()
+
+	select {
+	case <-ctx.Done():
+		fmt.Println("context deadline reached: ")
+	case <-done:
+		if errorInTicketIDFunc != nil {
+			return nil, errorInTicketIDFunc
+		}
+		return response, nil
+	}
+
+	return response, nil
 }
 
 func (m *MoviedbService) IsValidToCommitSeatsForBooking(ctx context.Context, in *moviedb.IsValidToCommitSeatsForBooking_Request) (*moviedb.IsValidToCommitSeatsForBooking_Response, error) {
@@ -1442,20 +1476,21 @@ func (m *MoviedbService) LockBookedSeats(ctx context.Context, in *moviedb.GetBoo
 	}, nil
 }
 
-func (m *MoviedbService) CreateTicket(ctx context.Context, in *moviedb.CreateTicketRequest) (*moviedb.CreateRequestResponse, error) {
+func (m *MoviedbService) CreateTicket(ctx context.Context, in *moviedb.CreateTicketRequest) (*moviedb.CreateTicketResponse, error) {
 
-	status, err := m.MovieDB.CreateTicket(in.IdempotentKey, in.TrasactionId)
+	ticketID, status, err := m.MovieDB.CreateTicket(in.IdempotentKey, in.TrasactionId)
 
 	if err != nil || status != 200 {
-		return &moviedb.CreateRequestResponse{
+		return &moviedb.CreateTicketResponse{
 			Status: int32(status),
 			Error:  err.Error(),
 		}, err
 	}
 
-	return &moviedb.CreateRequestResponse{
-		Status: 200,
-		Error:  "",
+	return &moviedb.CreateTicketResponse{
+		Status:   200,
+		Error:    "",
+		TicketID: ticketID,
 	}, nil
 }
 

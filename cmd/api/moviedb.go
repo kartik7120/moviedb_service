@@ -3,10 +3,13 @@ package api
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net/mail"
+	"strconv"
 	"time"
 
 	"github.com/go-playground/validator/v10"
+	moviedb "github.com/kartik7120/booking_moviedb_service/cmd/grpcServer"
 	"github.com/kartik7120/booking_moviedb_service/cmd/helper"
 	"github.com/kartik7120/booking_moviedb_service/cmd/models"
 	"gorm.io/gorm"
@@ -107,6 +110,92 @@ func (m *MovieDB) AddVenue(venue models.Venue) (models.Venue, int, error) {
 	}
 
 	return venue, 200, nil
+}
+
+func (m *MovieDB) GetTicketID(ticketID string) (*moviedb.GetTicketDetailsResponse, error) {
+
+	var ticket models.Ticket
+
+	result := m.DB.Conn.Model(models.Ticket{}).Where("ticket_id = ?", ticketID).Find(&ticket)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	if ticket.ID == 0 {
+		return nil, errors.New("no ticket with this ID exists")
+	}
+
+	var bookedSeats []models.BookedSeats
+	ids := []int32(ticket.BookedSeatsID)
+
+	err := m.DB.Conn.
+		Model(&models.BookedSeats{}).
+		Where("id IN ?", ids).
+		Find(&bookedSeats).Error
+
+	if err != nil {
+		// Handle error appropriately
+		log.Printf("Failed to fetch booked seats: %v", err)
+
+		return nil, err
+	}
+
+	var movieTimeSlot models.MovieTimeSlot
+
+	result = m.DB.Conn.Model(models.MovieTimeSlot{}).Where("ID = ?", bookedSeats[0].MovieTimeSlotID).Find(&movieTimeSlot)
+
+	if result.Error != nil {
+		return nil, err
+	}
+
+	if movieTimeSlot.ID == 0 {
+		return nil, errors.New("could not find any movie time slots of this ID")
+	}
+
+	var movie models.Movie
+
+	result = m.DB.Conn.Model(models.Movie{}).Where("ID = ?", movieTimeSlot.MovieID).Find(&movie)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	if movie.ID == 0 {
+		return nil, errors.New("could not find any movie with this ID: " + string(movieTimeSlot.MovieID))
+	}
+
+	var venue models.Venue
+
+	result = m.DB.Conn.Model(models.Venue{}).Where("ID = ?", movieTimeSlot.VenueID).Find(&venue)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	if venue.ID == 0 {
+		return nil, errors.New("could not find any venue of this ID")
+	}
+
+	var seatNumbers []string
+
+	for _, v := range bookedSeats {
+		seatNumbers = append(seatNumbers, v.SeatNumber)
+	}
+
+	return &moviedb.GetTicketDetailsResponse{
+		ImageURL:     movie.PosterURL,
+		MovieTitle:   movie.Title,
+		CinemaName:   venue.CinemaName,
+		ShowTime:     movieTimeSlot.StartTime.Local().Format("03:04 PM"),
+		Date:         movieTimeSlot.Date.Local().Format("2006-01-02"),
+		BookingID:    ticketID,
+		VenueName:    venue.Name,
+		ScreenNumber: strconv.Itoa(venue.ScreenNumber),
+		SeatNumbers:  seatNumbers,
+		Format:       venue.MovieFormatSupported[0],
+		Language:     movie.Language[0],
+	}, nil
 }
 
 // func (m *MovieDB) AddMovie(movie models.Movie, movieTimeSlots []models.MovieTimeSlot, seats []models.SeatMatrix) (models.Movie, int, error) {
@@ -779,6 +868,16 @@ func (m *MovieDB) DeleteMovieTimeSlot(movieTimeSlotID uint) (int, error) {
 }
 
 func (m *MovieDB) AddMovieTimeSlot(movieTimeSlot models.MovieTimeSlot) (models.MovieTimeSlot, int, error) {
+
+	// All the changes made here need to be a part of a transaction
+
+	// Start transaction
+
+	tx := m.DB.Conn.Begin()
+
+	if tx.Error != nil {
+		return movieTimeSlot, 500, tx.Error
+	}
 	fmt.Println("calling AddMovieTimeSlot in moviedb.go file")
 
 	err := validate.Struct(movieTimeSlot)
@@ -786,7 +885,14 @@ func (m *MovieDB) AddMovieTimeSlot(movieTimeSlot models.MovieTimeSlot) (models.M
 		return movieTimeSlot, 400, err
 	}
 
-	result := m.DB.Conn.Create(&movieTimeSlot)
+	// result := m.DB.Conn.Create(&movieTimeSlot)
+
+	result := tx.Clauses(clause.OnConflict{DoNothing: true}).Create(&movieTimeSlot)
+
+	if result.Error != nil && result.Error.Error() == "ERROR: duplicate key value violates unique constraint \"uniq_movie_time_slots\" (SQLSTATE 23505)" {
+		tx.Rollback()
+		return movieTimeSlot, 400, errors.New("ERROR: duplicate key value violates unique constraint \"uniq_movie_time_slots\" (SQLSTATE 23505)")
+	}
 
 	if result.Error != nil {
 		return movieTimeSlot, 500, result.Error
@@ -815,7 +921,9 @@ func (m *MovieDB) AddMovieTimeSlot(movieTimeSlot models.MovieTimeSlot) (models.M
 		bookedSeats = append(bookedSeats, bookedSeat)
 	}
 
-	result = m.DB.Conn.Create(&bookedSeats)
+	// result = m.DB.Conn.Create(&bookedSeats)
+
+	result = tx.Clauses(clause.OnConflict{DoNothing: true}).Create(&bookedSeats)
 
 	if result.Error != nil && result.Error.Error() == "ERROR: duplicate key value violates unique constraint \"idx_unique_seat\" (SQLSTATE 23505)" {
 		return movieTimeSlot, 400, errors.New("ERROR: duplicate key value violates unique constraint \"idx_unique_seat\" (SQLSTATE 23505)")
@@ -828,6 +936,19 @@ func (m *MovieDB) AddMovieTimeSlot(movieTimeSlot models.MovieTimeSlot) (models.M
 	if result.Error != nil {
 		return movieTimeSlot, 500, result.Error
 	}
+
+	// Commit the transaction
+
+	if err := tx.Commit().Error; err != nil {
+		return movieTimeSlot, 500, fmt.Errorf("commit error: %v", err)
+	}
+
+	go func() {
+		err := recover()
+		if err != nil {
+			fmt.Println("Recovered in f", err)
+		}
+	}()
 
 	return movieTimeSlot, 200, nil
 }
@@ -1003,12 +1124,14 @@ func (m *MovieDB) BookSeats(movieTimeSlotID int32, email string, phoneNumber str
 
 		if len(fmt.Sprint(phoneNumber)) < 10 {
 			tx.Rollback()
-			return 400, fmt.Errorf("invalid phone number")
+			fmt.Printf("Length of phone number %d and phone number %s", len(phoneNumber), phoneNumber)
+			return 400, fmt.Errorf("invalid phone number %s", phoneNumber)
 		}
 
 		if len(fmt.Sprint(phoneNumber)) > 15 {
 			tx.Rollback()
-			return 400, fmt.Errorf("invalid phone number")
+			fmt.Printf("Length of phone number %d and phone number %s", len(phoneNumber), phoneNumber)
+			return 400, fmt.Errorf("invalid phone number %s", phoneNumber)
 		}
 
 		// check if email is valid
@@ -1022,6 +1145,7 @@ func (m *MovieDB) BookSeats(movieTimeSlotID int32, email string, phoneNumber str
 
 		existingSeat.PhoneNumber = phoneNumber
 		existingSeat.Email = &m.Address
+		existingSeat.IsBooked = true
 
 		// Update booking
 		if err := tx.Model(&existingSeat).Updates(existingSeat).Error; err != nil {
@@ -1203,31 +1327,58 @@ func (m *MovieDB) LockBookedSeats(bookedSeatsIDs []int32) (int, error) {
 	return 200, nil
 }
 
-func (m *MovieDB) CreateTicket(idempotent_key string, transaction_id string) (int, error) {
+func (m *MovieDB) CreateTicket(idempotent_key string, transaction_id string) (string, int, error) {
 
 	var idempotent models.Idempotent
 
-	result := m.DB.Conn.Model(&models.Idempotent{}).Where("idempotent_key = ?", idempotent_key).Find(&idempotent)
+	result := m.DB.Conn.Model(models.Idempotent{}).Where("idempotent_key = ?", idempotent_key).Find(&idempotent)
 
 	if result.Error != nil {
-		return 500, result.Error
+		return "", 500, result.Error
 	}
+
+	// Generate a six alphanumeric unique string for ticket number
+
+	if idempotent.ID == 0 {
+		return "", 400, errors.New("idempotent key not found")
+	}
+
+	// Check if ticket already exists for this idempotent key
+
+	var existingTicket models.Ticket
+
+	// result = m.DB.Conn.Model(models.Ticket{}).Where("booked_seats_id = ? AND customer_id = ?", idempotent.BookedSeatsId, idempotent.CustomerID).Find(&existingTicket)
+
+	result = m.DB.Conn.Model(&models.Ticket{}).
+		Where("booked_seats_id && ?", idempotent.BookedSeatsId).
+		Where("customer_id = ?", idempotent.CustomerID).
+		First(&existingTicket)
+
+	if result.Error == nil {
+		fmt.Println("⚠️ Duplicate booking found:", existingTicket)
+	} else if result.Error != gorm.ErrRecordNotFound {
+		fmt.Println("DB error:", result.Error)
+	}
+	// Generate ticket
+
+	ticketID := helper.GenerateRandomString(6)
 
 	result = m.DB.Conn.Model(&models.Ticket{}).Create(&models.Ticket{
 		BookedSeatsID: idempotent.BookedSeatsId,
 		CustomerID:    idempotent.CustomerID,
 		TransactionID: transaction_id,
+		TicketID:      ticketID,
 	})
 
 	if result.Error != nil {
-		return 500, result.Error
+		return "", 500, result.Error
 	}
 
 	if result.RowsAffected == 0 {
-		return 500, errors.New("failed to create ticket, no rows affected")
+		return "", 500, errors.New("failed to create ticket, no rows affected")
 	}
 
-	return 200, nil
+	return ticketID, 200, nil
 }
 
 func (m *MovieDB) GetMovieTimeSlot(movie_time_slot_id int32) (*models.MovieTimeSlot, error) {

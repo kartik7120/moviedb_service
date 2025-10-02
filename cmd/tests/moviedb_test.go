@@ -696,50 +696,53 @@ func TestMovieDB(t *testing.T) {
 		// 	{Row: 2, Column: 2, Price: 900, SeatNumber: "B2", Type: "Silver"},
 		// })
 
-		// movie := models.Movie{
-		// 	Title:           "The Batman",
-		// 	Description:     "In his second year of fighting crime, Batman uncovers corruption in Gotham City while pursuing the Riddler, a sadistic serial killer.",
-		// 	ReleaseDate:     releaseDate,
-		// 	PosterURL:       "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/74xTEgt7R36Fpooo50r9T25onhq.jpg", // official poster
-		// 	Duration:        176,                                                                                   // minutes
-		// 	Language:        pq.StringArray([]string{"English"}),
-		// 	Type:            pq.StringArray([]string{"Action", "Crime", "Drama"}),
-		// 	MovieResolution: pq.StringArray([]string{"4K", "IMAX", "1080p"}),
-		// 	CastCrew: []models.CastAndCrew{
-		// 		{Type: "Cast", Name: "Robert Pattinson", Character: "Bruce Wayne / Batman", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/cK3cfcJvsAq3H8NwEyy3JdnJ7wX.jpg"},
-		// 		{Type: "Cast", Name: "Zoë Kravitz", Character: "Selina Kyle / Catwoman", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/5kW9xg2vTKXq2kfR1yX5y4J0x2S.jpg"},
-		// 		{Type: "Cast", Name: "Paul Dano", Character: "Edward Nashton / Riddler", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/7cxRWzi4LsVm4Utfpr1hfARNurT.jpg"},
-		// 		{Type: "Crew", Name: "Matt Reeves", Character: "Director", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/nloz3z6Uyt1v0fFNoXMlfgBFjHi.jpg"},
-		// 	},
-		// 	Ranking: 9,
-		// 	Votes:   5400,
-		// 	Venues: []models.Venue{
-		// 		{
-		// 			Name:                 "Gotham Grand Cinema",
-		// 			Type:                 "IMAX",
-		// 			Address:              "200 Wayne Tower, Gotham City",
-		// 			Latitude:             40.7128,
-		// 			Longitude:            -74.0060,
-		// 			Rows:                 25,
-		// 			Columns:              40,
-		// 			ScreenNumber:         8,
-		// 			MovieFormatSupported: pq.StringArray([]string{"IMAX", "4K", "Dolby Atmos"}),
-		// 			LanguagesSupported:   pq.StringArray([]string{"English", "Spanish"}),
-		// 		},
-		// 		{
-		// 			Name:                 "Arkham Multiplex",
-		// 			Type:                 "Digital",
-		// 			Address:              "500 Arkham Ave, Gotham City",
-		// 			Latitude:             40.7139,
-		// 			Longitude:            -74.0010,
-		// 			Rows:                 20,
-		// 			Columns:              30,
-		// 			ScreenNumber:         9,
-		// 			MovieFormatSupported: pq.StringArray([]string{"Digital", "3D"}),
-		// 			LanguagesSupported:   pq.StringArray([]string{"English"}),
-		// 		},
-		// 	},
-		// }
+		releaseDate := time.Now().UTC() // today’s date
+
+		movie := models.Movie{
+			Title:           "The Batman",
+			Description:     "In his second year of fighting crime, Batman uncovers corruption in Gotham City while pursuing the Riddler, a sadistic serial killer.",
+			ReleaseDate:     releaseDate,
+			PosterURL:       "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/74xTEgt7R36Fpooo50r9T25onhq.jpg", // official poster
+			Duration:        176,                                                                                   // minutes
+			Language:        pq.StringArray([]string{"English"}),
+			Type:            pq.StringArray([]string{"Action", "Crime", "Drama"}),
+			MovieResolution: pq.StringArray([]string{"4K", "IMAX", "1080p"}),
+			CastCrew: []models.CastAndCrew{
+				{Type: "Cast", Name: "Robert Pattinson", Character: "Bruce Wayne / Batman", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/cK3cfcJvsAq3H8NwEyy3JdnJ7wX.jpg"},
+				{Type: "Cast", Name: "Zoë Kravitz", Character: "Selina Kyle / Catwoman", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/5kW9xg2vTKXq2kfR1yX5y4J0x2S.jpg"},
+				{Type: "Cast", Name: "Paul Dano", Character: "Edward Nashton / Riddler", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/7cxRWzi4LsVm4Utfpr1hfARNurT.jpg"},
+				{Type: "Crew", Name: "Matt Reeves", Character: "Director", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/nloz3z6Uyt1v0fFNoXMlfgBFjHi.jpg"},
+			},
+			TrailerURL: "https://www.youtube.com/watch?v=mqqft2x_Aa4", // official trailer
+			Ranking:    9,
+			Votes:      5400,
+			Venues: []models.Venue{
+				{
+					Name:                 "Gotham Grand Cinema",
+					Type:                 "IMAX",
+					Address:              "200 Wayne Tower, Gotham City",
+					Latitude:             40.7128,
+					Longitude:            -74.0060,
+					Rows:                 25,
+					Columns:              40,
+					ScreenNumber:         8,
+					MovieFormatSupported: pq.StringArray([]string{"IMAX", "4K", "Dolby Atmos"}),
+					LanguagesSupported:   pq.StringArray([]string{"English", "Spanish"}),
+				},
+				{
+					Name:                 "Arkham Multiplex",
+					Type:                 "Digital",
+					Address:              "500 Arkham Ave, Gotham City",
+					Latitude:             40.7139,
+					Longitude:            -74.0010,
+					Rows:                 20,
+					Columns:              30,
+					ScreenNumber:         9,
+					MovieFormatSupported: pq.StringArray([]string{"Digital", "3D"}),
+					LanguagesSupported:   pq.StringArray([]string{"English"}),
+				},
+			},
+		}
 
 		// // Create timeslots
 		// st1 := time.Date(releaseDate.Year(), releaseDate.Month(), releaseDate.Day(), 18, 30, 0, 0, time.UTC)
@@ -857,54 +860,54 @@ func TestMovieDB(t *testing.T) {
 		// 	{Row: 2, Column: 2, Price: 700, SeatNumber: "B2", Type: "Silver"},
 		// }
 
-		releaseDate := time.Now().UTC() // today’s date
+		// releaseDate := time.Now().UTC() // today’s date
 
-		movie := models.Movie{
-			Title:           "Tron: Ares",
-			Description:     "A sequel to the Tron franchise, following a new digital adventure in the Grid led by Ares.",
-			ReleaseDate:     releaseDate,
-			PosterURL:       "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/tron_ares_poster.jpg", // placeholder poster
-			Duration:        150,                                                                        // approx runtime
-			Language:        pq.StringArray([]string{"English"}),
-			Type:            pq.StringArray([]string{"Sci-Fi", "Action", "Adventure"}),
-			MovieResolution: pq.StringArray([]string{"IMAX", "4K", "3D"}),
+		// movie := models.Movie{
+		// 	Title:           "Tron: Ares",
+		// 	Description:     "A sequel to the Tron franchise, following a new digital adventure in the Grid led by Ares.",
+		// 	ReleaseDate:     releaseDate,
+		// 	PosterURL:       "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/tron_ares_poster.jpg", // placeholder poster
+		// 	Duration:        150,                                                                        // approx runtime
+		// 	Language:        pq.StringArray([]string{"English"}),
+		// 	Type:            pq.StringArray([]string{"Sci-Fi", "Action", "Adventure"}),
+		// 	MovieResolution: pq.StringArray([]string{"IMAX", "4K", "3D"}),
 
-			CastCrew: []models.CastAndCrew{
-				{Type: "Cast", Name: "Jared Leto", Character: "Ares", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/jared_leto.jpg"},
-				{Type: "Cast", Name: "Greta Lee", Character: "Unknown", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/greta_lee.jpg"},
-				{Type: "Crew", Name: "Joachim Rønning", Character: "Director", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/joachim_ronning.jpg"},
-			},
+		// 	CastCrew: []models.CastAndCrew{
+		// 		{Type: "Cast", Name: "Jared Leto", Character: "Ares", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/jared_leto.jpg"},
+		// 		{Type: "Cast", Name: "Greta Lee", Character: "Unknown", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/greta_lee.jpg"},
+		// 		{Type: "Crew", Name: "Joachim Rønning", Character: "Director", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/joachim_ronning.jpg"},
+		// 	},
 
-			Ranking: 8,
-			Votes:   2100,
+		// 	Ranking: 8,
+		// 	Votes:   2100,
 
-			Venues: []models.Venue{
-				{
-					Name:                 "Neo Grid IMAX",
-					Type:                 "IMAX",
-					Address:              "42 Flynn’s Arcade, Grid City",
-					Latitude:             34.0522,
-					Longitude:            -118.2437,
-					Rows:                 30,
-					Columns:              45,
-					ScreenNumber:         19,
-					MovieFormatSupported: pq.StringArray([]string{"IMAX", "4K", "3D"}),
-					LanguagesSupported:   pq.StringArray([]string{"English", "Japanese"}),
-				},
-				{
-					Name:                 "Digital Arena",
-					Type:                 "Digital",
-					Address:              "99 ENCOM Tower, Grid City",
-					Latitude:             34.0532,
-					Longitude:            -118.2400,
-					Rows:                 25,
-					Columns:              35,
-					ScreenNumber:         20,
-					MovieFormatSupported: pq.StringArray([]string{"Digital", "Dolby Atmos"}),
-					LanguagesSupported:   pq.StringArray([]string{"English"}),
-				},
-			},
-		}
+		// 	Venues: []models.Venue{
+		// 		{
+		// 			Name:                 "Neo Grid IMAX",
+		// 			Type:                 "IMAX",
+		// 			Address:              "42 Flynn’s Arcade, Grid City",
+		// 			Latitude:             34.0522,
+		// 			Longitude:            -118.2437,
+		// 			Rows:                 30,
+		// 			Columns:              45,
+		// 			ScreenNumber:         19,
+		// 			MovieFormatSupported: pq.StringArray([]string{"IMAX", "4K", "3D"}),
+		// 			LanguagesSupported:   pq.StringArray([]string{"English", "Japanese"}),
+		// 		},
+		// 		{
+		// 			Name:                 "Digital Arena",
+		// 			Type:                 "Digital",
+		// 			Address:              "99 ENCOM Tower, Grid City",
+		// 			Latitude:             34.0532,
+		// 			Longitude:            -118.2400,
+		// 			Rows:                 25,
+		// 			Columns:              35,
+		// 			ScreenNumber:         20,
+		// 			MovieFormatSupported: pq.StringArray([]string{"Digital", "Dolby Atmos"}),
+		// 			LanguagesSupported:   pq.StringArray([]string{"English"}),
+		// 		},
+		// 	},
+		// }
 
 		// Time slots: today + tomorrow
 		st1 := time.Date(releaseDate.Year(), releaseDate.Month(), releaseDate.Day(), 19, 0, 0, 0, time.UTC)
@@ -1168,8 +1171,6 @@ func TestMovieDB(t *testing.T) {
 
 		m := api.NewMovieDB()
 
-		// connect to database
-
 		conn, err := helper.ConnectToDB()
 
 		if err != nil {
@@ -1181,11 +1182,11 @@ func TestMovieDB(t *testing.T) {
 		_, err = time.Parse("2006-01-02", "2022-03-04")
 
 		if err != nil {
-			t.Errorf("error parsing release date")
+			t.Errorf("error parsing release ")
 			return
 		}
 
-		releaseDate := time.Now().UTC() // today’s date
+		releaseDate := time.Now().UTC()
 
 		st1 := time.Date(releaseDate.Year(), releaseDate.Month(), releaseDate.Day(), 19, 0, 0, 0, time.UTC)
 		et1 := st1.Add(2*time.Hour + 30*time.Minute)
@@ -1198,28 +1199,45 @@ func TestMovieDB(t *testing.T) {
 				StartTime:   st1,
 				EndTime:     et1,
 				Duration:    int(et1.Sub(st1).Minutes()),
-				Date:        releaseDate,
+				Date:        releaseDate.AddDate(0, 0, 1),
 				MovieFormat: "IMAX",
-				MovieID:     1,
-				VenueID:     1,
+				MovieID:     3,
+				VenueID:     2,
 			},
 			{
 				StartTime:   st2,
 				EndTime:     et2,
 				Duration:    int(et2.Sub(st2).Minutes()),
-				Date:        releaseDate.AddDate(0, 0, 1), // tomorrow
+				Date:        releaseDate.AddDate(0, 0, 2), // tomorrow
 				MovieFormat: "Digital",
-				MovieID:     1,
-				VenueID:     1,
+				MovieID:     3,
+				VenueID:     2,
 			},
 		}
 
-		result := m.DB.Conn.Model(models.MovieTimeSlot{}).Create(timeSlots)
+		// result := m.DB.Conn.Model(models.MovieTimeSlot{}).Create(timeSlots)
 
-		if result.Error != nil {
-			t.Error(result.Error)
-			return
+		// Need to use addmovie time slot method to properly create time slot and corressponding booked seats
+
+		for _, v := range timeSlots {
+
+			_, status, err := m.AddMovieTimeSlot(v)
+
+			if status != 200 {
+				t.Errorf("status should be 200 after adding movie time slot")
+				return
+			}
+
+			if err != nil {
+				t.Errorf("error should be nil after adding movie time slot: %v", err)
+				return
+			}
 		}
+
+		// if result.Error != nil {
+		// 	t.Error(result.Error)
+		// 	return
+		// }
 
 	})
 
@@ -1342,6 +1360,22 @@ func TestMovieDB(t *testing.T) {
 
 		// m.DB.Conn.AutoMigrate(&models.BookedSeats{}, &models.MovieTimeSlot{}, &models.CastAndCrew{}, &models.Review{}, &models.Venue{}, &models.SeatMatrix{}, &models.Movie{}, &models.User{}, &models.Idempotent{}, &models.CastAndCrew{}, &models.Review{}, &models.Ticket{}, &models.User{})
 
-		m.DB.Conn.AutoMigrate(&models.Idempotent{})
+		// m.DB.Conn.AutoMigrate(&models.Ticket{})
+		err = m.DB.Conn.AutoMigrate(&models.Venue{})
+
+		if err != nil {
+			t.Errorf("error migrating database: %s", err.Error())
+		}
+	})
+
+	t.Run("Generate a six digit ticket ID", func(t *testing.T) {
+		ticketID := helper.GenerateRandomString(6)
+
+		if len(ticketID) != 6 {
+			t.Error("ticket ID should be six characters long")
+			return
+		}
+
+		t.Logf("Generated ticket ID: %s", ticketID)
 	})
 }

@@ -5,6 +5,7 @@ import (
 	"crypto/elliptic"
 	"crypto/rand"
 	"math"
+	mathRand "math/rand"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -48,4 +49,20 @@ func Haversine(lat1, lon1, lat2, lon2 float64) float64 {
 
 func EndOfDay(t time.Time) time.Time {
 	return time.Date(t.Year(), t.Month(), t.Day(), 23, 59, 59, 0, t.Location())
+}
+
+const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+// generateRandomString generates a random string of a given length from the charset.
+func GenerateRandomString(length int) string {
+	// Seed the random number generator using the current time for varying results.
+	// For production or cryptographic use, consider a cryptographically secure random number generator.
+
+	r := mathRand.New(mathRand.NewSource(time.Now().UnixNano()))
+
+	b := make([]byte, length)
+	for i := range b {
+		b[i] = charset[r.Intn(len(charset))]
+	}
+	return string(b)
 }

@@ -103,6 +103,7 @@ type Venue struct {
 	Seats          []SeatMatrix    `json:"seats" gorm:"foreignKey:VenueID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	MovieTimeSlots []MovieTimeSlot `json:"movie_time_slots" gorm:"foreignKey:VenueID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	Movies         []Movie         `json:"movies" gorm:"many2many:movie_venues;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	CinemaName     string          `json:"cinema_name" gorm:"type:text;default:null"`
 }
 
 type User struct {
@@ -116,14 +117,15 @@ type User struct {
 type Ticket struct {
 	gorm.Model
 	MovieID       uint          `json:"movie_id" gorm:"not null"`
-	BookedSeatsID pq.Int32Array `json:"booked_seats_id" gorm:"not null"`
+	BookedSeatsID pq.Int32Array `json:"booked_seats_id" gorm:"type:integer[];not null"`
 	CustomerID    string        `json:"customer_id" gorm:"not null"`
 	TransactionID string        `json:"transaction_id" gorm:"not null;unique"`
+	TicketID      string        `json:"ticket_id" gorm:"not null;unique"`
 }
 
 type Idempotent struct {
 	gorm.Model
-	PaymentID     string         `json:"payment_id" gorm:"not null;unique"`     // Unique Idempotency key for the payment
+	PaymentID     *string        `json:"payment_id" gorm:"unique;default:null"`
 	CustomerID    string         `json:"customer_id" gorm:"not null"`           // Unique ID of the customer associated with the idempotency key
 	IdempotentKey string         `json:"idempotent_key" gorm:"not null;unique"` // Unique idempotency key to ensure the operation is not repeated
 	OrderIDs      pq.StringArray `json:"order_ids" gorm:"type:text[]"`          // List of order IDs associated with the idempotency key
@@ -131,12 +133,12 @@ type Idempotent struct {
 	// UpdatedAt  int64  `json:"updated_at" gorm:"not null"`        // Timestamp when the idempotency key was last updated
 	// DeletedAt  *int64 `json:"deleted_at" gorm:"index"`           // Timestamp when the idempotency key was deleted, if applicable
 	// ID         uint   `json:"id" gorm:"primaryKey"`              // Primary key for the idempotency record
-	ExpiredAt     time.Time `json:"expired_at" gorm:"not null"`     // Timestamp when the idempotency key expires
-	PaymentStatus string    `json:"payment_status" gorm:"not null"` // Status of the payment associated with the idempotency key
+	ExpiredAt     time.Time `json:"expired_at" gorm:"not null"`            // Timestamp when the idempotency key expires
+	PaymentStatus string    `json:"payment_status" gorm:"default:pending"` // Status of the payment associated with the idempotency key
 	// VenueID         uint          `json:"venue_id" gorm:"not null"`       // ID of the venue associated with the idempotency key
 	// MovieID         uint          `json:"movie_id" gorm:"not null"`
 	BookedSeatsId   pq.Int32Array `json:"booked_seats_id" gorm:"type:integer[]"` // List of booked seat IDs associated with the idempotency key
 	MovieTimeSlotID uint          `json:"movie_time_slot_id" gorm:"not null"`    // ID of the movie time slot associated with the idempotency key
-	IsTicketSent    bool          `json:"is_ticket_sent" gorm:"not null"`        // Flag to indicate if the ticket has been sent
-	IsMailSend      bool          `json:"is_mail_send" gorm:"not null"`          // Flag to indicate if the mail has been sent
+	IsTicketSent    bool          `json:"is_ticket_sent" gorm:"default:false"`   // Flag to indicate if the ticket has been sent
+	IsMailSend      bool          `json:"is_mail_send" gorm:"default:false"`     // Flag to indicate if the mail has been sent
 }
