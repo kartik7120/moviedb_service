@@ -32,7 +32,7 @@ type BookedSeats struct {
 	SeatNumber      string     `json:"seat_number" gorm:"not null;uniqueIndex:idx_unique_booked_seats"`
 	MovieTimeSlotID uint       `json:"movie_time_slot_id" gorm:"not null;uniqueIndex:idx_unique_booked_seats"` // Link booking to a movie show
 	SeatMatrixID    uint       `json:"seat_matrix_id" gorm:"not null;uniqueIndex:idx_unique_booked_seats"`     // Reference seat matrix for consistency
-	IsBooked        bool       `json:"is_booked"`
+	IsBooked        bool       `json:"is_booked" gorm:"default:false"`
 	Email           *string    `json:"email" validate:"required,email"`
 	PhoneNumber     string     `json:"phone_number" validate:"required,e164"`
 	LockedUntil     *time.Time `json:"locked_until"` // Optional field to lock the seat for a certain period

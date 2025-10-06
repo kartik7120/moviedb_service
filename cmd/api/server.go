@@ -1346,6 +1346,8 @@ func (m *MoviedbService) GetBookedSeats(ctx context.Context, in *moviedb.GetBook
 		seats = append(seats, seat)
 	}
 
+	fmt.Printf("Booked seats in service.go file : %+v\n", seats)
+
 	return &moviedb.GetBookedSeatsResponse{
 		Status:      200,
 		Message:     "success",

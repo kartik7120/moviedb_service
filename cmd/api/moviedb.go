@@ -1172,6 +1172,8 @@ func (m *MovieDB) GetBookedSeats(movieTimeSlotID uint) ([]models.BookedSeats, in
 		return nil, 500, result.Error
 	}
 
+	fmt.Printf("Booked seats: %+v\n", bookedSeats)
+
 	return bookedSeats, 200, nil
 }
 
