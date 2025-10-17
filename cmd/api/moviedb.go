@@ -597,6 +597,7 @@ func (m *MovieDB) AddReview(review models.Review) (models.Review, int, error) {
 	}
 
 	result := m.DB.Conn.Create(&review)
+
 	if result.Error != nil {
 		return review, 500, result.Error
 	}
@@ -615,22 +616,41 @@ func (m *MovieDB) GetReview(userID, movieID, reviewID uint) (models.Review, int,
 	return review, 200, nil
 }
 
-func (m *MovieDB) UpdateReview(title string, comment string, rating int, userID, movieID, reviewID uint) (models.Review, int, error) {
+func (m *MovieDB) UpdateReview(
+	title string,
+	comment string,
+	rating int,
+	userID, movieID, reviewID uint,
+	containsSpoiler bool,
+	language string,
+	format string,
+) (models.Review, int, error) {
+
 	var review models.Review
-	result := m.DB.Conn.Table("reviews").Where("user_id = ? AND movie_id = ? AND id = ?", userID, movieID, reviewID).First(&review)
+
+	// Fetch the review
+	result := m.DB.Conn.
+		Where("user_id = ? AND movie_id = ? AND id = ?", userID, movieID, reviewID).
+		First(&review)
 
 	if result.Error != nil {
 		return review, 500, result.Error
 	}
 
+	// Update fields
 	review.Title = title
 	review.Comment = comment
 	review.Rating = rating
+	review.ContainsSpoiler = containsSpoiler
+	review.Language = language
+	review.Format = format
+	review.IsEdited = true
+	review.UpdatedAt = time.Now()
 
-	result = m.DB.Conn.Save(&review)
-
-	if result.Error != nil {
-		return review, 500, result.Error
+	// Save changes
+	saveResult := m.DB.Conn.Save(&review)
+	if saveResult.Error != nil {
+		return review, 500, saveResult.Error
 	}
 
 	return review, 200, nil
@@ -661,7 +681,7 @@ type ReviewListResponse struct {
 		Rating   int    `json:"rating" gorm:"not null"` // rating out of 5
 		Comment  string `json:"comment"`
 		Title    string `json:"title"`
-		UserID   uint   `json:"user_id"` // user who wrote the review
+		UserID   int    `json:"user_id"` // user who wrote the review
 		Username string `json:"username"`
 	} `json:"reviews"`
 	TotalReviews int64 `json:"total_reviews"`
@@ -710,16 +730,27 @@ func (m *MovieDB) GetAllMovieReviews(movieID uint, limit int, offset int, sortBy
 		Rating   int    `json:"rating" gorm:"not null"` // rating out of 5
 		Comment  string `json:"comment"`
 		Title    string `json:"title"`
-		UserID   uint   `json:"user_id"` // user who wrote the review
+		UserID   int    `json:"user_id"` // user who wrote the review
 		Username string `json:"username"`
 	}, 0)
 
 	for i := range reviews {
 		// Fetch user details for each review
 		var user models.User
-		err := m.DB.Conn.Table("users").Where("id = ?", reviews[i].UserID).First(&user).Error
-		if err != nil {
-			return ReviewListResponse{}, 500, err
+
+		if reviews[i].UserID != -1 && reviews[i].UserID > 0 {
+
+			err := m.DB.Conn.Model(models.User{}).Where("id = ?", reviews[i].UserID).First(&user).Error
+			if err != nil {
+				return ReviewListResponse{}, 500, err
+			}
+		} else {
+			user.Username = "Anonymous"
+			user.Email = ""
+			user.ID = -1
+			user.CreatedAt = time.Time{}
+			user.UpdatedAt = time.Time{}
+			user.DeletedAt = gorm.DeletedAt{}
 		}
 
 		var reviewResult struct {
@@ -729,7 +760,7 @@ func (m *MovieDB) GetAllMovieReviews(movieID uint, limit int, offset int, sortBy
 			Rating   int    `json:"rating" gorm:"not null"` // rating out of 5
 			Comment  string `json:"comment"`
 			Title    string `json:"title"`
-			UserID   uint   `json:"user_id"` // user who wrote the review
+			UserID   int    `json:"user_id"` // user who wrote the review
 			Username string `json:"username"`
 		}
 

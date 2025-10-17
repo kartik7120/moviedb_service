@@ -224,18 +224,22 @@ func (m *MoviedbService) GetMovie(ctx context.Context, in *moviedb.MovieRequest)
 		Status:  200,
 		Message: "Sucess",
 		Movie: &moviedb.Movie{
-			Title:           movie.Title,
-			Description:     movie.Description,
-			Duration:        int32(movie.Duration),
-			Language:        movie.Language,
-			Type:            movie.Type,
-			CastCrew:        castCrew,
-			PosterUrl:       movie.PosterURL,
-			ReleaseDate:     movie.ReleaseDate.Format("2006-01-02"),
-			TrailerUrl:      movie.TrailerURL,
-			MovieResolution: movie.MovieResolution,
-			Id:              int32(movie.ID),
-			Votes:           int64(movie.Votes),
+			Title:               movie.Title,
+			Description:         movie.Description,
+			Duration:            int32(movie.Duration),
+			Language:            movie.Language,
+			Type:                movie.Type,
+			CastCrew:            castCrew,
+			PosterUrl:           movie.PosterURL,
+			ReleaseDate:         movie.ReleaseDate.Format("2006-01-02"),
+			TrailerUrl:          movie.TrailerURL,
+			MovieResolution:     movie.MovieResolution,
+			Id:                  int32(movie.ID),
+			Votes:               int64(movie.Votes),
+			ScreenWidePosterUrl: movie.ScreenWidePosterURL,
+			Ranking:             int32(movie.Ranking),
+			TitlePosterUrl:      movie.LogoImageURL,
+			LogoImageURL:        movie.LogoImageURL,
 		},
 	}, nil
 }
@@ -703,11 +707,16 @@ func (m *MoviedbService) AddReview(ctx context.Context, in *moviedb.Review) (*mo
 	defer cancel()
 
 	review := models.Review{
-		Rating:  int(in.Rating),
-		Comment: in.Comment,
-		UserID:  uint(in.UserID),
-		MovieID: uint(in.MovieID),
-		Title:   in.Title,
+		Rating:          int(in.Rating),
+		Comment:         in.Comment,
+		UserID:          int(in.UserID),
+		MovieID:         uint(in.MovieID),
+		Title:           in.Title,
+		ContainsSpoiler: in.ContainsSpoiler,
+		Language:        in.Language,
+		Format:          in.Format,
+		Likes:           int(in.Likes),
+		Dislikes:        int(in.Dislikes),
 	}
 
 	_, status, err := m.MovieDB.AddReview(review)
@@ -762,7 +771,7 @@ func (m *MoviedbService) UpdateReview(ctx context.Context, in *moviedb.ReviewUpd
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	review, status, err := m.MovieDB.UpdateReview(in.Title, in.Comment, int(in.Rating), uint(in.UserID), uint(in.MovieID), uint(in.ReviewID))
+	review, status, err := m.MovieDB.UpdateReview(in.Title, in.Comment, int(in.Rating), uint(in.UserID), uint(in.MovieID), uint(in.ReviewID), in.ContainsSpoiler, in.Language, in.Format)
 
 	if status != 200 || err != nil {
 		return &moviedb.ReviewResponse{
@@ -842,7 +851,7 @@ func (m *MoviedbService) GetAllMovieReviews(ctx context.Context, in *moviedb.Get
 			Title:        review.Title,
 			UserID:       int32(review.UserID),
 			ReviewID:     int32(review.ID),
-			CreatedAt:    int32(review.CreatedAt.UnixMilli()),
+			CreatedAt:    (review.CreatedAt.UnixMilli()),
 			ReviewerName: review.Username,
 		})
 	}

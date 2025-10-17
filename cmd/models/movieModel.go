@@ -42,12 +42,18 @@ type BookedSeats struct {
 
 type Review struct {
 	gorm.Model
-	MovieID uint `json:"movie_id"`
-	// Also need to add movie id in the review table
-	Rating  int    `json:"rating" gorm:"not null"` // rating out of 5
-	Comment string `json:"comment"`
-	Title   string `json:"title"`
-	UserID  uint   `json:"user_id"` // user who wrote the review
+	MovieID         uint       `json:"movie_id" gorm:"not null;index"` // FK to movies table
+	UserID          int        `json:"user_id" gorm:"index"`           // FK to users table (-1 for anonymous)
+	Title           string     `json:"title" gorm:"type:varchar(255);not null"`
+	Comment         string     `json:"comment" gorm:"type:text"`
+	Rating          int        `json:"rating" gorm:"not null;check:rating >= 1 AND rating <= 5"` // 1–5 only
+	ContainsSpoiler bool       `json:"contains_spoiler" gorm:"default:false"`                    // marks if review has spoilers
+	Language        string     `json:"language" gorm:"type:varchar(50);default:'English'"`       // e.g., Hindi, Tamil, etc.
+	Format          string     `json:"format" gorm:"type:varchar(20);default:'2D'"`              // 2D, 3D, IMAX, 4DX, etc.
+	Likes           int        `json:"likes" gorm:"default:0"`                                   // count of likes (can be incremented)
+	Dislikes        int        `json:"dislikes" gorm:"default:0"`                                // count of dislikes
+	WatchedAt       *time.Time `json:"watched_at"`                                               // when user watched the movie (optional)
+	IsEdited        bool       `json:"is_edited" gorm:"default:false"`                           // if review was updated after posting
 }
 
 type MovieTimeSlot struct {

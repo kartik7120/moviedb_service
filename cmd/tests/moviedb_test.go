@@ -1361,7 +1361,7 @@ func TestMovieDB(t *testing.T) {
 		// m.DB.Conn.AutoMigrate(&models.BookedSeats{}, &models.MovieTimeSlot{}, &models.CastAndCrew{}, &models.Review{}, &models.Venue{}, &models.SeatMatrix{}, &models.Movie{}, &models.User{}, &models.Idempotent{}, &models.CastAndCrew{}, &models.Review{}, &models.Ticket{}, &models.User{})
 
 		// m.DB.Conn.AutoMigrate(&models.Ticket{})
-		err = m.DB.Conn.AutoMigrate(&models.Review{})
+		err = m.DB.Conn.AutoMigrate(&models.User{})
 
 		if err != nil {
 			t.Errorf("error migrating database: %s", err.Error())
