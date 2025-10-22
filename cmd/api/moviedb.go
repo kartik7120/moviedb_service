@@ -740,14 +740,22 @@ func (m *MovieDB) GetAllMovieReviews(movieID uint, limit int, offset int, sortBy
 
 		if reviews[i].UserID != -1 && reviews[i].UserID > 0 {
 
+			// fmt.Printf("Review user struct %#v", reviews[i])
+
 			err := m.DB.Conn.Model(models.User{}).Where("id = ?", reviews[i].UserID).First(&user).Error
-			if err != nil {
+
+			if err.Error() == "record not found" {
+				user.Username = "Anonymous"
+				user.Email = ""
+				user.CreatedAt = time.Time{}
+				user.UpdatedAt = time.Time{}
+				user.DeletedAt = gorm.DeletedAt{}
+			} else if err != nil {
 				return ReviewListResponse{}, 500, err
 			}
 		} else {
 			user.Username = "Anonymous"
 			user.Email = ""
-			user.ID = -1
 			user.CreatedAt = time.Time{}
 			user.UpdatedAt = time.Time{}
 			user.DeletedAt = gorm.DeletedAt{}
