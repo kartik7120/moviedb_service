@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"net"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/kartik7120/booking_moviedb_service/cmd/api"
@@ -16,6 +18,21 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
+
+func connectRabbitMQ(url string, retries int, delay time.Duration) (*amqp091.Connection, error) {
+	var conn *amqp091.Connection
+	var err error
+
+	for i := range retries {
+		conn, err = amqp091.Dial(url)
+		if err == nil {
+			return conn, nil
+		}
+		fmt.Printf("Retrying RabbitMQ connection (%d/%d)...\n", i+1, retries)
+		time.Sleep(delay)
+	}
+	return nil, err
+}
 
 func main() {
 	err := godotenv.Load()
@@ -31,7 +48,7 @@ func main() {
 
 	if err != nil {
 		log.Error("Error loading .env file")
-		panic(err)
+		// panic(err)
 	}
 
 	lis, err := net.Listen("tcp", ":1102")
@@ -59,7 +76,7 @@ func main() {
 		panic(err)
 	}
 
-	conn, err := amqp091.Dial("amqp://guest:guest@localhost:5672/")
+	conn, err := connectRabbitMQ("amqp://guest:guest@rabbitmq_booking_app:5672/", 5, 3*time.Second)
 
 	if err != nil {
 		log.Error("error connecting to to rabbitmq", err.Error())
