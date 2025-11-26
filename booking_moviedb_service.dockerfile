@@ -6,4 +6,6 @@ WORKDIR /app
 
 COPY moviedbApp /app/moviedbApp
 
+RUN chmod +x moviedbApp
+
 CMD [ "./moviedbApp" ]
