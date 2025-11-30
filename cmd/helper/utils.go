@@ -4,10 +4,12 @@ import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
+	"encoding/json"
 	"math"
 	mathRand "math/rand"
 	"time"
 
+	"github.com/kartik7120/booking_moviedb_service/cmd/models"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -65,4 +67,24 @@ func GenerateRandomString(length int) string {
 		b[i] = charset[r.Intn(len(charset))]
 	}
 	return string(b)
+}
+
+func ConvertAnyDataIntoCastAndCrewType(data any) (models.CastAndCrew, error) {
+	var castCrew models.CastAndCrew
+
+	// convert data any type to castCrew models.CastAndCrew type
+
+	dataBytes, err := json.Marshal(data)
+
+	if err != nil {
+		return castCrew, err
+	}
+
+	err = json.Unmarshal(dataBytes, &castCrew)
+
+	if err != nil {
+		return castCrew, err
+	}
+
+	return castCrew, nil
 }

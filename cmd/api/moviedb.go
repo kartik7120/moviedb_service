@@ -4,11 +4,16 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"net/http"
 	"net/mail"
+	"net/url"
+	"os"
+	"reflect"
 	"strconv"
 	"time"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/kartik7120/booking_moviedb_service/cmd/consumers"
 	moviedb "github.com/kartik7120/booking_moviedb_service/cmd/grpcServer"
 	"github.com/kartik7120/booking_moviedb_service/cmd/helper"
 	"github.com/kartik7120/booking_moviedb_service/cmd/models"
@@ -1432,5 +1437,102 @@ func (m *MovieDB) GetMovieTimeSlot(movie_time_slot_id int32) (*models.MovieTimeS
 	}
 
 	return &movieTimeSlot, nil
+
+}
+
+func (m *MovieDB) AddCastStrapiEntry(cast_add_event consumers.EventStrapiCreate) error {
+	var castCrew models.CastAndCrew
+
+	strapiURL := os.Getenv("STRAPI_URL")
+	strapiToken := os.Getenv("STRAPI_API_TOKEN")
+
+	if strapiURL == "" || strapiToken == "" {
+		return errors.New("strapi url or token not set in environment variables")
+	}
+
+	// convert cast_add_event.data any type to models.CastAndCrew
+
+	if reflect.TypeOf(cast_add_event.Data) != reflect.TypeOf(map[string]interface{}{}) {
+		return errors.New("invalid data type for cast and crew")
+	}
+
+	name, exists := cast_add_event.Data["name"]
+	if !exists || reflect.TypeOf(name) != reflect.TypeOf("") {
+		return errors.New("invalid name type for cast and crew")
+	}
+
+	movieID, exists := cast_add_event.Data["movie_id"]
+
+	if !exists && reflect.TypeOf(movieID) != reflect.TypeOf(float64(0)) {
+		return errors.New("movie_id not found in cast and crew data")
+	}
+
+	typeOfRole, exists := cast_add_event.Data["type"]
+
+	if !exists || reflect.TypeOf(typeOfRole) != reflect.TypeOf("") {
+		return errors.New("invalid type for cast and crew")
+	}
+
+	castCrew, err := helper.ConvertAnyDataIntoCastAndCrewType(cast_add_event)
+
+	if err != nil {
+		return err
+	}
+
+	castStrapiUID, exists := cast_add_event.Data["starpi_cast_uid"]
+
+	if !exists || reflect.TypeOf(castStrapiUID) != reflect.TypeOf("") {
+		return errors.New("invalid strapi_cast_uid type for cast and crew")
+	}
+
+	tx := m.DB.Conn.Begin()
+
+	if tx.Error != nil {
+		return tx.Error
+	}
+
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	result := tx.Clauses(clause.OnConflict{DoNothing: true}).Create(&castCrew)
+
+	if result.Error != nil {
+		tx.Rollback()
+		return result.Error
+	}
+
+	// add the cast and crew id in the strapi model using the strapi api
+
+	httpClient := http.Client{
+		Timeout: time.Second * 10,
+	}
+
+	resp, err := httpClient.Do(&http.Request{
+		Method: "PUT",
+		URL: &url.URL{
+			Path: fmt.Sprintf("%s/api/casts?filters[starpi_cast_uid][$eq]=%s", strapiURL, castStrapiUID),
+		},
+		Header: http.Header{
+			"Authorization": []string{fmt.Sprintf("Bearer %s", strapiToken)},
+			"Content-Type":  []string{"application/json"},
+		},
+	})
+
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		tx.Rollback()
+		return fmt.Errorf("failed to update strapi cast and crew with id %s, status code: %d", castStrapiUID, resp.StatusCode)
+	}
+
+	return nil
 
 }
