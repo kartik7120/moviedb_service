@@ -101,11 +101,20 @@ func main() {
 		log.Info("Listening on incoming message from Send_Mail_Consumer")
 		err := consumer.Send_Mail_Consumer()
 		if err != nil {
-			log.Error("failed to consume send mail messages")
+			log.Error("failed to consume send mail messages : ", err.Error())
 			os.Exit(1)
 			return
 		}
+	}()
 
+	go func() {
+		log.Info("Listening on incoming message from Strapi_Create_Consumer")
+		err := consumer.Strapi_Create()
+		if err != nil {
+			log.Error("failed to consume strapi create messages : ", err.Error())
+			os.Exit(1)
+			return
+		}
 	}()
 
 	moviedbObj := api.NewMovieDB()

@@ -10,11 +10,20 @@ import (
 
 type Consumer struct {
 	conn *amqp091.Channel
+	DB   helper.DBConfig
 }
 
 func NewConsumer(c *amqp091.Channel) Consumer {
+
+	db, err := helper.ConnectToDB()
+
+	if err != nil {
+		panic("Failed to connect to DB in Consumer")
+	}
+
 	return Consumer{
 		conn: c,
+		DB:   helper.DBConfig{Conn: db},
 	}
 }
 
