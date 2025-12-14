@@ -1302,6 +1302,36 @@ func TestMovieDB(t *testing.T) {
 
 	})
 
+	t.Run("delete cast and crew", func(t *testing.T) {
+		err := godotenv.Load()
+
+		if err != nil {
+			t.Error("error loading .env file", err)
+			return
+		}
+
+		m := api.NewMovieDB()
+
+		conn, err := helper.ConnectToDB()
+
+		if err != nil {
+			t.Error("error connecting to the database", err)
+			return
+		}
+
+		m.DB.Conn = conn
+
+		castAndCrewID := 132
+
+		status, err := m.DB.Conn.Unscoped().Where("id = ?", castAndCrewID).Delete(&models.CastAndCrew{}).RowsAffected, nil
+
+		if status == 0 {
+			t.Error("error deleting cast and crew, no rows affected")
+			return
+		}
+
+	})
+
 	t.Run("Add seats in venue", func(t *testing.T) {
 		seatMatrix := []models.SeatMatrix{
 			{Row: 1, Column: 1, Price: 1500, SeatNumber: "A1", Type: "Platinum", VenueID: 1},

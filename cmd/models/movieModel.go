@@ -13,7 +13,7 @@ type CastAndCrew struct {
 	Name      string `json:"name" gorm:"not null"`
 	Character string `json:"character"`
 	PhotoURL  string `json:"photo_url"`
-	MovieID   uint
+	MovieID   uint   `json:"movie_id"`
 }
 
 type SeatMatrix struct {

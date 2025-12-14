@@ -4,12 +4,12 @@ import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
-	"encoding/json"
+	"fmt"
 	"math"
 	mathRand "math/rand"
 	"time"
 
-	"github.com/kartik7120/booking_moviedb_service/cmd/models"
+	"github.com/rabbitmq/amqp091-go"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -69,22 +69,17 @@ func GenerateRandomString(length int) string {
 	return string(b)
 }
 
-func ConvertAnyDataIntoCastAndCrewType(data any) (models.CastAndCrew, error) {
-	var castCrew models.CastAndCrew
+func ConnectRabbitMQ(url string, retries int, delay time.Duration) (*amqp091.Connection, error) {
+	var conn *amqp091.Connection
+	var err error
 
-	// convert data any type to castCrew models.CastAndCrew type
-
-	dataBytes, err := json.Marshal(data)
-
-	if err != nil {
-		return castCrew, err
+	for i := range retries {
+		conn, err = amqp091.Dial(url)
+		if err == nil {
+			return conn, nil
+		}
+		fmt.Printf("Retrying RabbitMQ connection (%d/%d)...\n", i+1, retries)
+		time.Sleep(delay)
 	}
-
-	err = json.Unmarshal(dataBytes, &castCrew)
-
-	if err != nil {
-		return castCrew, err
-	}
-
-	return castCrew, nil
+	return nil, err
 }

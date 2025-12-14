@@ -3,9 +3,12 @@ package consumers
 import (
 	"encoding/json"
 	"fmt"
+	"os"
+	"time"
 
 	"github.com/kartik7120/booking_moviedb_service/cmd/helper"
 	"github.com/rabbitmq/amqp091-go"
+	log "github.com/sirupsen/logrus"
 )
 
 type Consumer struct {
@@ -28,7 +31,24 @@ func NewConsumer(c *amqp091.Channel) Consumer {
 }
 
 func (c *Consumer) Send_Mail_Consumer() error {
-	q, err := c.conn.QueueDeclare(
+
+	conn, err := helper.ConnectRabbitMQ("amqp://guest:guest@rabbitmq_booking_app:5672/", 5, 3*time.Second)
+
+	if err != nil {
+		log.Error("error connecting to to rabbitmq in send mail consumer", err.Error())
+		os.Exit(1)
+		return err
+	}
+
+	ch, err := conn.Channel()
+
+	if err != nil {
+		log.Error("error connecting to to channel for send mail consumer", err.Error())
+		os.Exit(1)
+		return err
+	}
+
+	q, err := ch.QueueDeclare(
 		"send_mail_queue2",
 		true,
 		false,
@@ -36,11 +56,12 @@ func (c *Consumer) Send_Mail_Consumer() error {
 		false,
 		nil,
 	)
+
 	if err != nil {
 		return err
 	}
 
-	dlq, err := c.conn.QueueDeclare(
+	dlq, err := ch.QueueDeclare(
 		"dead_letter_queue",
 		true,
 		false,
@@ -48,11 +69,38 @@ func (c *Consumer) Send_Mail_Consumer() error {
 		false,
 		nil,
 	)
+
 	if err != nil {
 		return err
 	}
 
-	msgs, err := c.conn.Consume(
+	err = ch.ExchangeDeclare(
+		"send_mail",
+		"direct",
+		true, // durable
+		false,
+		false,
+		false,
+		nil,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	err = ch.QueueBind(
+		q.Name,
+		"send_mail_key",
+		"send_mail",
+		false,
+		nil,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	msgs, err := ch.Consume(
 		q.Name,
 		"",
 		false,
