@@ -698,46 +698,95 @@ func TestMovieDB(t *testing.T) {
 
 		releaseDate := time.Now().UTC() // today’s date
 
+		// movie := models.Movie{
+		// 	Title:           "The Batman",
+		// 	Description:     "In his second year of fighting crime, Batman uncovers corruption in Gotham City while pursuing the Riddler, a sadistic serial killer.",
+		// 	ReleaseDate:     releaseDate,
+		// 	PosterURL:       "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/74xTEgt7R36Fpooo50r9T25onhq.jpg", // official poster
+		// 	Duration:        176,                                                                                   // minutes
+		// 	Language:        pq.StringArray([]string{"English"}),
+		// 	Type:            pq.StringArray([]string{"Action", "Crime", "Drama"}),
+		// 	MovieResolution: pq.StringArray([]string{"4K", "IMAX", "1080p"}),
+		// 	CastCrew: []models.CastAndCrew{
+		// 		{Type: "Cast", Name: "Robert Pattinson", Character: "Bruce Wayne / Batman", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/cK3cfcJvsAq3H8NwEyy3JdnJ7wX.jpg"},
+		// 		{Type: "Cast", Name: "Zoë Kravitz", Character: "Selina Kyle / Catwoman", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/5kW9xg2vTKXq2kfR1yX5y4J0x2S.jpg"},
+		// 		{Type: "Cast", Name: "Paul Dano", Character: "Edward Nashton / Riddler", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/7cxRWzi4LsVm4Utfpr1hfARNurT.jpg"},
+		// 		{Type: "Crew", Name: "Matt Reeves", Character: "Director", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/nloz3z6Uyt1v0fFNoXMlfgBFjHi.jpg"},
+		// 	},
+		// 	TrailerURL: "https://www.youtube.com/watch?v=mqqft2x_Aa4", // official trailer
+		// 	Ranking:    9,
+		// 	Votes:      5400,
+		// 	Venues: []models.Venue{
+		// 		{
+		// 			Name:                 "Gotham Grand Cinema",
+		// 			Type:                 "IMAX",
+		// 			Address:              "200 Wayne Tower, Gotham City",
+		// 			Latitude:             40.7128,
+		// 			Longitude:            -74.0060,
+		// 			Rows:                 25,
+		// 			Columns:              40,
+		// 			ScreenNumber:         8,
+		// 			MovieFormatSupported: pq.StringArray([]string{"IMAX", "4K", "Dolby Atmos"}),
+		// 			LanguagesSupported:   pq.StringArray([]string{"English", "Spanish"}),
+		// 		},
+		// 		{
+		// 			Name:                 "Arkham Multiplex",
+		// 			Type:                 "Digital",
+		// 			Address:              "500 Arkham Ave, Gotham City",
+		// 			Latitude:             40.7139,
+		// 			Longitude:            -74.0010,
+		// 			Rows:                 20,
+		// 			Columns:              30,
+		// 			ScreenNumber:         9,
+		// 			MovieFormatSupported: pq.StringArray([]string{"Digital", "3D"}),
+		// 			LanguagesSupported:   pq.StringArray([]string{"English"}),
+		// 		},
+		// 	},
+		// }
+
 		movie := models.Movie{
-			Title:           "The Batman",
-			Description:     "In his second year of fighting crime, Batman uncovers corruption in Gotham City while pursuing the Riddler, a sadistic serial killer.",
-			ReleaseDate:     releaseDate,
-			PosterURL:       "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/74xTEgt7R36Fpooo50r9T25onhq.jpg", // official poster
-			Duration:        176,                                                                                   // minutes
-			Language:        pq.StringArray([]string{"English"}),
-			Type:            pq.StringArray([]string{"Action", "Crime", "Drama"}),
-			MovieResolution: pq.StringArray([]string{"4K", "IMAX", "1080p"}),
+			Title:       "Harry Potter and the Goblet of Fire",
+			Description: "Harry Potter finds himself competing in the dangerous Triwizard Tournament between three wizarding schools, while a dark force begins to rise once more.",
+			ReleaseDate: releaseDate,                                                                           // 2005-11-18
+			PosterURL:   "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/fECBtHlr0RB3foNHDiCBXeg9Bv9.jpg", // official poster
+			Duration:    157,                                                                                   // minutes
+			Language:    pq.StringArray([]string{"English"}),
+			Type:        pq.StringArray([]string{"Adventure", "Fantasy", "Family"}),
+			MovieResolution: pq.StringArray([]string{
+				"4K", "IMAX", "1080p",
+			}),
 			CastCrew: []models.CastAndCrew{
-				{Type: "Cast", Name: "Robert Pattinson", Character: "Bruce Wayne / Batman", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/cK3cfcJvsAq3H8NwEyy3JdnJ7wX.jpg"},
-				{Type: "Cast", Name: "Zoë Kravitz", Character: "Selina Kyle / Catwoman", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/5kW9xg2vTKXq2kfR1yX5y4J0x2S.jpg"},
-				{Type: "Cast", Name: "Paul Dano", Character: "Edward Nashton / Riddler", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/7cxRWzi4LsVm4Utfpr1hfARNurT.jpg"},
-				{Type: "Crew", Name: "Matt Reeves", Character: "Director", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/nloz3z6Uyt1v0fFNoXMlfgBFjHi.jpg"},
+				{Type: "Cast", Name: "Daniel Radcliffe", Character: "Harry Potter", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/iPg0J9UzAlPj1fLEJNllpW9IhGe.jpg"},
+				{Type: "Cast", Name: "Emma Watson", Character: "Hermione Granger", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/9f5A6R8JcV5Y1GZ6wq9CkJ3xHkA.jpg"},
+				{Type: "Cast", Name: "Rupert Grint", Character: "Ron Weasley", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/6v7kFq8jZk5y0t3V2m9L4ZCwzYH.jpg"},
+				{Type: "Cast", Name: "Ralph Fiennes", Character: "Lord Voldemort", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/4WwC8nX7H2Yj8sZ6T5f5Zz7FZzU.jpg"},
+				{Type: "Crew", Name: "Mike Newell", Character: "Director", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/9h9K3YkJp0y5R0S3wJ8D3sZ1E5R.jpg"},
 			},
-			TrailerURL: "https://www.youtube.com/watch?v=mqqft2x_Aa4", // official trailer
-			Ranking:    9,
-			Votes:      5400,
+			TrailerURL: "https://www.youtube.com/watch?v=3EGojp4Hh6I", // official trailer
+			Ranking:    8,
+			Votes:      7200,
 			Venues: []models.Venue{
 				{
-					Name:                 "Gotham Grand Cinema",
+					Name:                 "Hogwarts Grand Theatre",
 					Type:                 "IMAX",
-					Address:              "200 Wayne Tower, Gotham City",
-					Latitude:             40.7128,
-					Longitude:            -74.0060,
-					Rows:                 25,
-					Columns:              40,
-					ScreenNumber:         8,
+					Address:              "Hogsmeade Village, Scotland",
+					Latitude:             57.1500,
+					Longitude:            -2.1100,
+					Rows:                 24,
+					Columns:              38,
+					ScreenNumber:         4,
 					MovieFormatSupported: pq.StringArray([]string{"IMAX", "4K", "Dolby Atmos"}),
-					LanguagesSupported:   pq.StringArray([]string{"English", "Spanish"}),
+					LanguagesSupported:   pq.StringArray([]string{"English"}),
 				},
 				{
-					Name:                 "Arkham Multiplex",
+					Name:                 "Wizarding World Multiplex",
 					Type:                 "Digital",
-					Address:              "500 Arkham Ave, Gotham City",
-					Latitude:             40.7139,
-					Longitude:            -74.0010,
-					Rows:                 20,
-					Columns:              30,
-					ScreenNumber:         9,
+					Address:              "Diagon Alley, London",
+					Latitude:             51.5155,
+					Longitude:            -0.0922,
+					Rows:                 18,
+					Columns:              28,
+					ScreenNumber:         6,
 					MovieFormatSupported: pq.StringArray([]string{"Digital", "3D"}),
 					LanguagesSupported:   pq.StringArray([]string{"English"}),
 				},
@@ -1199,19 +1248,28 @@ func TestMovieDB(t *testing.T) {
 				StartTime:   st1,
 				EndTime:     et1,
 				Duration:    int(et1.Sub(st1).Minutes()),
-				Date:        releaseDate.AddDate(0, 0, 1),
+				Date:        releaseDate.AddDate(0, 0, 5),
 				MovieFormat: "IMAX",
-				MovieID:     3,
-				VenueID:     2,
+				MovieID:     61,
+				VenueID:     5,
 			},
 			{
 				StartTime:   st2,
 				EndTime:     et2,
 				Duration:    int(et2.Sub(st2).Minutes()),
-				Date:        releaseDate.AddDate(0, 0, 2), // tomorrow
+				Date:        releaseDate.AddDate(0, 1, 2), // tomorrow
 				MovieFormat: "Digital",
-				MovieID:     3,
-				VenueID:     2,
+				MovieID:     61,
+				VenueID:     5,
+			},
+			{
+				StartTime:   st2,
+				EndTime:     et2,
+				Duration:    int(et2.Sub(st2).Minutes()),
+				Date:        releaseDate.AddDate(1, 1, 2), // tomorrow
+				MovieFormat: "Digital",
+				MovieID:     61,
+				VenueID:     5,
 			},
 		}
 
@@ -1333,11 +1391,82 @@ func TestMovieDB(t *testing.T) {
 	})
 
 	t.Run("Add seats in venue", func(t *testing.T) {
+		// seatMatrix := []models.SeatMatrix{
+		// 	{Row: 1, Column: 1, Price: 1500, SeatNumber: "A1", Type: "Platinum", VenueID: 1},
+		// 	{Row: 1, Column: 2, Price: 1500, SeatNumber: "A2", Type: "Platinum", VenueID: 1},
+		// 	{Row: 2, Column: 1, Price: 1000, SeatNumber: "B1", Type: "Gold", VenueID: 1},
+		// 	{Row: 2, Column: 2, Price: 1000, SeatNumber: "B2", Type: "Gold", VenueID: 1},
+		// }
+
 		seatMatrix := []models.SeatMatrix{
-			{Row: 1, Column: 1, Price: 1500, SeatNumber: "A1", Type: "Platinum", VenueID: 1},
-			{Row: 1, Column: 2, Price: 1500, SeatNumber: "A2", Type: "Platinum", VenueID: 1},
-			{Row: 2, Column: 1, Price: 1000, SeatNumber: "B1", Type: "Gold", VenueID: 1},
-			{Row: 2, Column: 2, Price: 1000, SeatNumber: "B2", Type: "Gold", VenueID: 1},
+			// Platinum Seats (Rows A–B)
+			{Row: 1, Column: 1, Price: 1500, SeatNumber: "A1", Type: "Platinum", VenueID: 6},
+			{Row: 1, Column: 2, Price: 1500, SeatNumber: "A2", Type: "Platinum", VenueID: 6},
+			{Row: 1, Column: 3, Price: 1500, SeatNumber: "A3", Type: "Platinum", VenueID: 6},
+			{Row: 1, Column: 4, Price: 1500, SeatNumber: "A4", Type: "Platinum", VenueID: 6},
+			{Row: 1, Column: 5, Price: 1500, SeatNumber: "A5", Type: "Platinum", VenueID: 6},
+			{Row: 1, Column: 6, Price: 1500, SeatNumber: "A6", Type: "Platinum", VenueID: 6},
+			{Row: 1, Column: 7, Price: 1500, SeatNumber: "A7", Type: "Platinum", VenueID: 6},
+			{Row: 1, Column: 8, Price: 1500, SeatNumber: "A8", Type: "Platinum", VenueID: 6},
+			{Row: 1, Column: 9, Price: 1500, SeatNumber: "A9", Type: "Platinum", VenueID: 6},
+			{Row: 1, Column: 10, Price: 1500, SeatNumber: "A10", Type: "Platinum", VenueID: 6},
+
+			{Row: 2, Column: 1, Price: 1500, SeatNumber: "B1", Type: "Platinum", VenueID: 6},
+			{Row: 2, Column: 2, Price: 1500, SeatNumber: "B2", Type: "Platinum", VenueID: 6},
+			{Row: 2, Column: 3, Price: 1500, SeatNumber: "B3", Type: "Platinum", VenueID: 6},
+			{Row: 2, Column: 4, Price: 1500, SeatNumber: "B4", Type: "Platinum", VenueID: 6},
+			{Row: 2, Column: 5, Price: 1500, SeatNumber: "B5", Type: "Platinum", VenueID: 6},
+			{Row: 2, Column: 6, Price: 1500, SeatNumber: "B6", Type: "Platinum", VenueID: 6},
+			{Row: 2, Column: 7, Price: 1500, SeatNumber: "B7", Type: "Platinum", VenueID: 6},
+			{Row: 2, Column: 8, Price: 1500, SeatNumber: "B8", Type: "Platinum", VenueID: 6},
+			{Row: 2, Column: 9, Price: 1500, SeatNumber: "B9", Type: "Platinum", VenueID: 6},
+			{Row: 2, Column: 10, Price: 1500, SeatNumber: "B10", Type: "Platinum", VenueID: 6},
+
+			// Gold Seats (Rows C–D)
+			{Row: 3, Column: 1, Price: 1000, SeatNumber: "C1", Type: "Gold", VenueID: 6},
+			{Row: 3, Column: 2, Price: 1000, SeatNumber: "C2", Type: "Gold", VenueID: 6},
+			{Row: 3, Column: 3, Price: 1000, SeatNumber: "C3", Type: "Gold", VenueID: 6},
+			{Row: 3, Column: 4, Price: 1000, SeatNumber: "C4", Type: "Gold", VenueID: 6},
+			{Row: 3, Column: 5, Price: 1000, SeatNumber: "C5", Type: "Gold", VenueID: 6},
+			{Row: 3, Column: 6, Price: 1000, SeatNumber: "C6", Type: "Gold", VenueID: 6},
+			{Row: 3, Column: 7, Price: 1000, SeatNumber: "C7", Type: "Gold", VenueID: 6},
+			{Row: 3, Column: 8, Price: 1000, SeatNumber: "C8", Type: "Gold", VenueID: 6},
+			{Row: 3, Column: 9, Price: 1000, SeatNumber: "C9", Type: "Gold", VenueID: 6},
+			{Row: 3, Column: 10, Price: 1000, SeatNumber: "C10", Type: "Gold", VenueID: 6},
+
+			{Row: 4, Column: 1, Price: 1000, SeatNumber: "D1", Type: "Gold", VenueID: 6},
+			{Row: 4, Column: 2, Price: 1000, SeatNumber: "D2", Type: "Gold", VenueID: 6},
+			{Row: 4, Column: 3, Price: 1000, SeatNumber: "D3", Type: "Gold", VenueID: 6},
+			{Row: 4, Column: 4, Price: 1000, SeatNumber: "D4", Type: "Gold", VenueID: 6},
+			{Row: 4, Column: 5, Price: 1000, SeatNumber: "D5", Type: "Gold", VenueID: 6},
+			{Row: 4, Column: 6, Price: 1000, SeatNumber: "D6", Type: "Gold", VenueID: 6},
+			{Row: 4, Column: 7, Price: 1000, SeatNumber: "D7", Type: "Gold", VenueID: 6},
+			{Row: 4, Column: 8, Price: 1000, SeatNumber: "D8", Type: "Gold", VenueID: 6},
+			{Row: 4, Column: 9, Price: 1000, SeatNumber: "D9", Type: "Gold", VenueID: 6},
+			{Row: 4, Column: 10, Price: 1000, SeatNumber: "D10", Type: "Gold", VenueID: 6},
+
+			// Silver Seats (Rows E–F)
+			{Row: 5, Column: 1, Price: 700, SeatNumber: "E1", Type: "Silver", VenueID: 6},
+			{Row: 5, Column: 2, Price: 700, SeatNumber: "E2", Type: "Silver", VenueID: 6},
+			{Row: 5, Column: 3, Price: 700, SeatNumber: "E3", Type: "Silver", VenueID: 6},
+			{Row: 5, Column: 4, Price: 700, SeatNumber: "E4", Type: "Silver", VenueID: 6},
+			{Row: 5, Column: 5, Price: 700, SeatNumber: "E5", Type: "Silver", VenueID: 6},
+			{Row: 5, Column: 6, Price: 700, SeatNumber: "E6", Type: "Silver", VenueID: 6},
+			{Row: 5, Column: 7, Price: 700, SeatNumber: "E7", Type: "Silver", VenueID: 6},
+			{Row: 5, Column: 8, Price: 700, SeatNumber: "E8", Type: "Silver", VenueID: 6},
+			{Row: 5, Column: 9, Price: 700, SeatNumber: "E9", Type: "Silver", VenueID: 6},
+			{Row: 5, Column: 10, Price: 700, SeatNumber: "E10", Type: "Silver", VenueID: 6},
+
+			{Row: 6, Column: 1, Price: 700, SeatNumber: "F1", Type: "Silver", VenueID: 6},
+			{Row: 6, Column: 2, Price: 700, SeatNumber: "F2", Type: "Silver", VenueID: 6},
+			{Row: 6, Column: 3, Price: 700, SeatNumber: "F3", Type: "Silver", VenueID: 6},
+			{Row: 6, Column: 4, Price: 700, SeatNumber: "F4", Type: "Silver", VenueID: 6},
+			{Row: 6, Column: 5, Price: 700, SeatNumber: "F5", Type: "Silver", VenueID: 6},
+			{Row: 6, Column: 6, Price: 700, SeatNumber: "F6", Type: "Silver", VenueID: 6},
+			{Row: 6, Column: 7, Price: 700, SeatNumber: "F7", Type: "Silver", VenueID: 6},
+			{Row: 6, Column: 8, Price: 700, SeatNumber: "F8", Type: "Silver", VenueID: 6},
+			{Row: 6, Column: 9, Price: 700, SeatNumber: "F9", Type: "Silver", VenueID: 6},
+			{Row: 6, Column: 10, Price: 700, SeatNumber: "F10", Type: "Silver", VenueID: 6},
 		}
 
 		err := godotenv.Load()
@@ -1390,8 +1519,8 @@ func TestMovieDB(t *testing.T) {
 
 		// m.DB.Conn.AutoMigrate(&models.BookedSeats{}, &models.MovieTimeSlot{}, &models.CastAndCrew{}, &models.Review{}, &models.Venue{}, &models.SeatMatrix{}, &models.Movie{}, &models.User{}, &models.Idempotent{}, &models.CastAndCrew{}, &models.Review{}, &models.Ticket{}, &models.User{})
 
+		err = m.DB.Conn.AutoMigrate(&models.SeatMatrix{})
 		// m.DB.Conn.AutoMigrate(&models.Ticket{})
-		err = m.DB.Conn.AutoMigrate(&models.User{})
 
 		if err != nil {
 			t.Errorf("error migrating database: %s", err.Error())

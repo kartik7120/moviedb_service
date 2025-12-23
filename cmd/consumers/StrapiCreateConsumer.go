@@ -14,13 +14,14 @@ import (
 	"time"
 
 	"github.com/kartik7120/booking_moviedb_service/cmd/models"
+	"github.com/lib/pq"
 	"gorm.io/gorm/clause"
 )
 
 type EventStrapiCreate struct {
-	Data   map[string]interface{} `json:"data"`
-	Action string                 `json:"action"`
-	Model  string                 `json:"model"`
+	Data   map[string]any `json:"data"`
+	Action string         `json:"action"`
+	Model  string         `json:"model"`
 }
 
 type ExtendedCastAndCrew struct {
@@ -129,6 +130,25 @@ func ConvertAnyToMovieTimeSlotStrapi(data any) (MovieTimeSlotStrapi, error) {
 	return mts, nil
 }
 
+func ConvertAnyToStrapiMovie(data any) (StrapiMovie, error) {
+	var movie StrapiMovie
+
+	raw, err := json.Marshal(data)
+	if err != nil {
+		return movie, err
+	}
+
+	if err := json.Unmarshal(raw, &movie); err != nil {
+		return movie, err
+	}
+
+	if movie.StrapiMovieUID == "" {
+		return movie, errors.New("strapi movie uid missing")
+	}
+
+	return movie, nil
+}
+
 func MapMovieTimeSlotStrapiToModel(
 	s MovieTimeSlotStrapi,
 ) (models.MovieTimeSlot, error) {
@@ -159,6 +179,11 @@ func MapMovieTimeSlotStrapiToModel(
 	}, nil
 }
 
+type MovieFromStrapi struct {
+	Data []MovieStrapiResponseType `json:"data"`
+	Meta Meta                      `json:"meta"`
+}
+
 type CastResponse struct {
 	Data []Cast `json:"data"`
 	Meta Meta   `json:"meta"`
@@ -180,27 +205,22 @@ type Cast struct {
 }
 
 type StrapiMovie struct {
-	MovieResolution  string    `json:"movieResolution"`
-	CreatedAt        time.Time `json:"createdAt"`
-	Description      *string   `json:"description,omitempty"`
-	DocumentID       string    `json:"documentId"`
-	Duration         int64     `json:"duration"`
-	ID               int       `json:"id"`
-	IsSynced         bool      `json:"is_synced"`
-	Language         *string   `json:"language,omitempty"`
-	Languages        string    `json:"languages"`
-	LogoImageURL     *string   `json:"logoImageURL,omitempty"`
-	MovieID          *string   `json:"movieid,omitempty"`
-	PosterURL        string    `json:"posterURL"`
-	PublishedAt      time.Time `json:"publishedAt"`
-	Ranking          int       `json:"ranking"`
-	ReleaseDate      time.Time `json:"releaseDate"`
-	ScreenWidePoster *string   `json:"screenWidePoster,omitempty"`
-	Title            string    `json:"title"`
-	TrailerURL       *string   `json:"trailerURL,omitempty"`
-	Type             string    `json:"type"`
-	UpdatedAt        time.Time `json:"updatedAt"`
-	Votes            int       `json:"votes"`
+	ID                  int       `json:"id"`
+	Title               string    `json:"title" gorm:"not null;unique"`
+	Description         string    `json:"description" gorm:"not null"`
+	Duration            int       `json:"duration" gorm:"not null"`
+	Language            string    `json:"languages" gorm:"type:text[];not null"`
+	Type                []string  `json:"type" gorm:"type:text[];not null"`
+	PosterURL           string    `json:"poster_url"`
+	TrailerURL          string    `json:"trailer_url"`
+	ReleaseDate         time.Time `json:"release_date" gorm:"not null"`
+	MovieResolution     []string  `json:"movie_resolution" gorm:"type:text[];not null"`
+	Ranking             uint      `json:"ranking"`
+	Votes               uint      `json:"votes"`
+	ScreenWidePosterURL string    `json:"screen_wide_poster_url" gorm:"null,default:null"` // URL for a wide poster suitable for screens
+	LogoImageURL        string    `json:"logo_image_url" gorm:"null"`
+	StrapiMovieUID      string    `json:"strapi_movie_uid"`
+	MovieID             *int      `json:"movieid"`
 }
 
 type StrapiVenue struct {
@@ -502,112 +522,6 @@ func (c *Consumer) DeleteCastStrapiEntry(cast_delete_event EventStrapiCreate) er
 		return result.Error
 	}
 
-	// add the cast and crew id in the strapi model using the strapi api
-
-	// httpClient := http.Client{
-	// 	Timeout: time.Second * 10,
-	// }
-
-	// u, _ := url.Parse(strapiURL)
-
-	// u.Path = "/api/casts"
-	// q := u.Query()
-	// q.Set("filters[starpi_cast_uid][$eq]", castStrapiUID.(string))
-	// u.RawQuery = q.Encode()
-
-	// resp, err := httpClient.Do(&http.Request{
-	// 	Method: "GET",
-	// 	URL:    u,
-	// 	Header: http.Header{
-	// 		"Authorization": []string{fmt.Sprintf("Bearer %s", strapiToken)},
-	// 		"Content-Type":  []string{"application/json"},
-	// 	},
-	// })
-
-	// if err != nil {
-	// 	fmt.Println("error calling the strapi put endpoint : ", err.Error())
-	// 	tx.Rollback()
-	// 	return err
-	// }
-	// defer resp.Body.Close()
-
-	// if resp.StatusCode != http.StatusOK {
-	// 	tx.Rollback()
-	// 	return fmt.Errorf("failed to update strapi cast and crew with id %s, status code: %d", castStrapiUID, resp.StatusCode)
-	// }
-
-	// bodyBytes, err := io.ReadAll(resp.Body)
-
-	// if err != nil {
-	// 	tx.Rollback()
-	// 	return err
-	// }
-
-	// fmt.Println(string(bodyBytes))
-
-	// var strapiCastResponse CastResponse
-
-	// err = json.Unmarshal(bodyBytes, &strapiCastResponse)
-
-	// if err != nil {
-	// 	tx.Rollback()
-	// 	return err
-	// }
-
-	// if err := tx.Commit().Error; err != nil {
-	// 	return fmt.Errorf("commit error: %v", err)
-	// }
-
-	// var strapiDocumentID string
-
-	// for _, v := range strapiCastResponse.Data {
-	// 	strapiDocumentID = v.DocumentID
-	// }
-
-	// updateBody := CastUpdateBody{}
-	// updateBody.Data.CastID = fmt.Sprintf("%d", castCrew.ID) // convert to string
-	// updateBody.Data.IsSynced = true
-	// updateBody.Data.Starpi_cast_uid = castStrapiUID.(string)
-
-	// jsonRequestBody, err := json.Marshal(updateBody)
-
-	// if err != nil {
-	// 	tx.Rollback()
-	// 	return err
-	// }
-
-	// fmt.Println("document id : ", strapiDocumentID)
-
-	// u2, _ := url.Parse(strapiURL)
-	// u2.Path = fmt.Sprintf("/api/casts/%s", strapiDocumentID)
-
-	// resp, err = httpClient.Do(&http.Request{
-	// 	Method: "DELETE",
-	// 	URL:    u2,
-	// 	Header: http.Header{
-	// 		"Authorization": []string{fmt.Sprintf("Bearer %s", strapiToken)},
-	// 		"Content-Type":  []string{"application/json"},
-	// 	},
-	// 	Body: io.NopCloser(bytes.NewReader(jsonRequestBody)),
-	// })
-
-	// respBody, _ := io.ReadAll(resp.Body)
-	// fmt.Println("Strapi Response:", string(respBody))
-
-	// if err != nil {
-	// 	fmt.Println("error updating the document : ", err)
-	// 	tx.Rollback()
-	// 	return err
-	// }
-
-	// if resp.StatusCode != http.StatusNoContent {
-	// 	fmt.Println("error updating the document : ", string(respBody))
-	// 	tx.Rollback()
-	// 	return err
-	// }
-
-	// defer resp.Body.Close()
-
 	fmt.Println("Successfully deleted cast and crew with ID:", castCrew.ID)
 
 	return nil
@@ -824,32 +738,6 @@ func (c *Consumer) Strapi_Create() error {
 		return err
 	}
 
-	// Declare exchange
-	// err = c.conn.ExchangeDeclare(
-	// 	"strapi_create_exchange",
-	// 	"direct",
-	// 	true,
-	// 	false,
-	// 	false,
-	// 	false,
-	// 	nil,
-	// )
-	// if err != nil {
-	// 	return fmt.Errorf("error declaring exchange: %v", err)
-	// }
-
-	// // Bind routing key
-	// err = c.conn.QueueBind(
-	// 	q.Name,
-	// 	q.Name,
-	// 	"strapi_create_exchange",
-	// 	false,
-	// 	nil,
-	// )
-	// if err != nil {
-	// 	return fmt.Errorf("queue bind error: %v", err)
-	// }
-
 	// Start consumer
 	msgs, err := c.conn.Consume(
 		q.Name,
@@ -899,7 +787,7 @@ func (c *Consumer) Strapi_Create() error {
 			}
 
 			// Validate action/model
-			if msg.Model != "cast-and-crew" && msg.Model != "movie-time-slot" {
+			if msg.Model != "cast-and-crew" && msg.Model != "movie-time-slot" && msg.Model != "movie" {
 				fmt.Printf("Invalid event type: %v / %v\n", msg.Action, msg.Model)
 
 				retryCounter.Store(deliveryKey, retry+1)
@@ -974,11 +862,24 @@ func (c *Consumer) Strapi_Create() error {
 				case "create":
 					err = c.AddMovieTimeSlot(msg)
 				case "delete":
-					// future: c.DeleteMovieTimeSlot(msg)
+					// Need to implement DeleteMovieTimeSlot
 				default:
 					err = fmt.Errorf("unknown action: %s", msg.Action)
 				}
 
+			} else if msg.Model == "movie" {
+
+				switch msg.Action {
+				case "create":
+					err := c.AddMovie(msg)
+					if err != nil {
+						fmt.Printf("Error adding movie: %v\n", err)
+					}
+				case "delete":
+					err = c.DeleteMovie(msg)
+				default:
+					err = fmt.Errorf("unknown action: %s", msg.Action)
+				}
 			}
 
 			if err != nil {
@@ -1002,6 +903,284 @@ func (c *Consumer) Strapi_Create() error {
 			retryCounter.Delete(deliveryKey)
 		}
 	}()
+
+	return nil
+}
+
+func MapStrapiMovieToModel(s StrapiMovie) (models.Movie, error) {
+	movie := models.Movie{
+		Title:               s.Title,
+		Description:         s.Description,
+		Duration:            int(s.Duration),
+		Language:            pq.StringArray([]string{s.Language}),
+		PosterURL:           s.PosterURL,
+		Ranking:             s.Ranking,
+		ReleaseDate:         s.ReleaseDate,
+		Votes:               s.Votes,
+		TrailerURL:          s.TrailerURL,
+		MovieResolution:     pq.StringArray(s.MovieResolution),
+		Type:                pq.StringArray(s.Type),
+		ScreenWidePosterURL: s.ScreenWidePosterURL,
+		LogoImageURL:        s.LogoImageURL,
+	}
+
+	return movie, nil
+}
+
+type MovieStrapiResponseType struct {
+	ID               int       `json:"id"`
+	DocumentID       string    `json:"documentId"`
+	CreatedAt        time.Time `json:"createdAt"`
+	UpdatedAt        time.Time `json:"updatedAt"`
+	PublishedAt      time.Time `json:"publishedAt"`
+	Title            string    `json:"title"`
+	Description      *string   `json:"description"`
+	ReleaseDate      string    `json:"releaseDate"` // can be time.Time if you prefer
+	Duration         int       `json:"duration"`
+	Language         string    `json:"language"`
+	Type             []string  `json:"type"`
+	PosterURL        string    `json:"posterURL"`
+	TrailerURL       string    `json:"trailerURL"`
+	MovieResolution  string    `json:"MovieResolution"`
+	Ranking          int       `json:"ranking"`
+	Votes            int       `json:"votes"`
+	ScreenWidePoster string    `json:"screenWidePoster"`
+	LogoImageURL     string    `json:"logoImageURL"`
+	Languages        string    `json:"languages"`
+	IsSynced         bool      `json:"is_synced"`
+	MovieID          *int      `json:"movieid"`
+	StarpiMovieUID   string    `json:"starpi_movie_uid"`
+}
+
+func (c *Consumer) AddMovie(add_movie EventStrapiCreate) error {
+
+	strapi_url := os.Getenv("STRAPI_URL")
+	strapi_token := os.Getenv("STRAPI_API_TOKEN")
+
+	if strapi_url == "" || strapi_token == "" {
+		return errors.New("strapi url or token not set in environment variables")
+	}
+
+	fmt.Printf("add movie event received : %+v", add_movie)
+
+	strapiID, isExists := add_movie.Data["strapi_movie_uid"].(string)
+
+	if !isExists {
+		fmt.Printf("strapi movie timeslot uid does not exists")
+		return errors.New("strapi movie timeslot uid cannot be empty")
+	}
+
+	tx := c.DB.Conn.Begin()
+
+	if tx.Error != nil {
+		fmt.Printf("error creating a transaction : %s", tx.Error.Error())
+		return tx.Error
+	}
+
+	defer func() {
+		fmt.Println("panic occured while in movie consumer")
+		if r := recover(); r != nil {
+			tx.Rollback()
+			fmt.Printf("recover error in movie function: %+v", r)
+		}
+	}()
+
+	movieStrapiType, err := ConvertAnyToStrapiMovie(add_movie.Data)
+
+	if err != nil {
+		fmt.Printf("error converting to movie strapi type : %s", err.Error())
+		return err
+	}
+
+	fmt.Printf("movie strapi type %+v", movieStrapiType)
+
+	movie, err := MapStrapiMovieToModel(movieStrapiType)
+
+	if err != nil {
+		fmt.Printf("error mapping to model movie : %s", err.Error())
+		return err
+	}
+
+	result := tx.Clauses(clause.OnConflict{DoNothing: true}).Create(&movie)
+
+	if result.Error != nil {
+		fmt.Printf("error creating movie in db : %s", result.Error.Error())
+		tx.Rollback()
+		return result.Error
+	}
+
+	u, err := url.Parse(strapi_url)
+
+	if err != nil {
+		fmt.Println("error parsing the strapi url : ", err.Error())
+		return err
+	}
+
+	u.Path = "/api/movies"
+	q := u.Query()
+	q.Set("filters[starpi_movie_uid][$eq]", strapiID)
+	u.RawQuery = q.Encode()
+
+	httpClient := http.Client{
+		Timeout: time.Second * 10,
+	}
+
+	resp, err := httpClient.Do(
+		&http.Request{
+			Method: "GET",
+			URL:    u,
+			Header: http.Header{
+				"Authorization": []string{fmt.Sprintf("Bearer %s", strapi_token)},
+				"Content-Type":  []string{"application/json"},
+			},
+		},
+	)
+
+	if err != nil {
+		fmt.Printf("error calling the strapi endpoint : %s", err.Error())
+		fmt.Println("error calling the strapi get endpoint : ", err.Error())
+		return err
+	}
+
+	bodyBytes, err := io.ReadAll(resp.Body)
+
+	if resp != nil {
+		defer resp.Body.Close()
+		fmt.Println("Response is not nil")
+		fmt.Println("Strapi Response Status:", resp.Status)
+		// Error response body:
+		fmt.Println("Strapi Response Body:", string(bodyBytes))
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		fmt.Printf("error occured when calling the document strapi call : %s", err.Error())
+		return fmt.Errorf("failed to fetch strapi movie with id %s, status code: %d", strapiID, resp.StatusCode)
+	}
+
+	var respBody MovieFromStrapi
+
+	fmt.Println("Strapi Response:", string(bodyBytes))
+
+	if err != nil {
+		fmt.Printf("error reading response body : %s", err.Error())
+		fmt.Println("error fetching the document : ", err)
+		return err
+	}
+
+	err = json.Unmarshal(bodyBytes, &respBody)
+
+	if err != nil {
+		fmt.Printf("error unmarshalling the response body : %s", err.Error())
+		return err
+	}
+
+	documentID := ""
+
+	for _, v := range respBody.Data {
+		documentID = v.DocumentID
+	}
+
+	updateBody := struct {
+		Data struct {
+			MovieID  int  `json:"movieid,omitempty"`
+			IsSynced bool `json:"is_synced"`
+		} `json:"data"`
+	}{}
+
+	updateBody.Data.MovieID = int(movie.ID)
+	updateBody.Data.IsSynced = true
+
+	jsonRequestBody, err := json.Marshal(updateBody)
+
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("document id for movie strapi : %s", documentID)
+
+	u2, _ := url.Parse(strapi_url)
+	u2.Path = fmt.Sprintf("/api/movies/%s", documentID)
+
+	resp, err = httpClient.Do(&http.Request{
+		Method: "PUT",
+		URL:    u2,
+		Header: http.Header{
+			"Authorization": []string{fmt.Sprintf("Bearer %s", strapi_token)},
+			"Content-Type":  []string{"application/json"},
+		},
+		Body: io.NopCloser(bytes.NewReader(jsonRequestBody)),
+	})
+
+	resBody, _ := io.ReadAll(resp.Body)
+	fmt.Println("Strapi Response:", string(resBody))
+
+	if err != nil {
+		fmt.Println("error calling the strapi put endpoint : ", err.Error())
+		fmt.Println("error updating the document : ", err)
+		return err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		fmt.Println("error updating the document : ", string(resBody))
+		return err
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		fmt.Printf("error committing the transaction : %s", err.Error())
+		return fmt.Errorf("commit error: %v", err)
+	}
+
+	fmt.Println("Successfully added movie with ID:", movie.ID, " Strapi UID: ", strapiID)
+
+	defer resp.Body.Close()
+
+	return nil
+}
+
+func (c *Consumer) DeleteMovie(delete_movie EventStrapiCreate) error {
+
+	strapi_url := os.Getenv("STRAPI_URL")
+	strapi_token := os.Getenv("STRAPI_API_TOKEN")
+
+	if strapi_url == "" || strapi_token == "" {
+		return errors.New("strapi url or token not set in environment variables")
+	}
+
+	fmt.Printf("data received from producer : %+v", delete_movie.Data)
+
+	movie, err := ConvertAnyToStrapiMovie(delete_movie.Data)
+
+	if err != nil {
+		fmt.Printf("error converting to movie strapi type : %s", err.Error())
+		return err
+	}
+
+	fmt.Printf("movie strapi type %+v", movie)
+
+	tx := c.DB.Conn.Begin()
+
+	if tx.Error != nil {
+		fmt.Printf("error creating a transaction : %s", tx.Error.Error())
+		return tx.Error
+	}
+
+	defer func() {
+		fmt.Println("panic occured while in movie consumer")
+		if r := recover(); r != nil {
+			tx.Rollback()
+			fmt.Printf("recover error in movie function: %+v", r)
+		}
+	}()
+
+	result := c.DB.Conn.Unscoped().Where("id = ?", movie.ID).Delete(&models.Movie{})
+
+	if result.Error != nil {
+		fmt.Printf("error deleting movie in db : %s", result.Error.Error())
+		tx.Rollback()
+		return result.Error
+	}
+
+	fmt.Println("Successfully deleted movie with ID:", movie.ID)
 
 	return nil
 }

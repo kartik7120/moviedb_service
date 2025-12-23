@@ -533,12 +533,12 @@ func (m *MovieDB) GetUpcomingMovies(date string) ([]models.Movie, int, error) {
 	}
 
 	// Calculate start and end dates
-	startDate := d.AddDate(0, 0, 1)
+	// startDate := d.AddDate(0, 0, 0)
 	endDate := d.AddDate(0, 7, 0)
 
 	// Query the database
 	var movies []models.Movie
-	result := m.DB.Conn.Table("movies").Where("release_date BETWEEN ? AND ?", startDate, endDate).Preload("CastCrew").Find(&movies)
+	result := m.DB.Conn.Table("movies").Where("release_date > ?", endDate).Preload("CastCrew").Find(&movies)
 
 	if result.Error != nil {
 		return nil, 500, result.Error
@@ -551,6 +551,7 @@ func (m *MovieDB) GetUpcomingMovies(date string) ([]models.Movie, int, error) {
 func (m *MovieDB) GetNowPlayingMovies(longitude, latitude int32) ([]models.Movie, int, error) {
 	today := time.Now().Truncate(24 * time.Hour)
 	todayMidNight := time.Now().AddDate(0, 0, 1).Truncate(24 * time.Hour)
+	afterSevenDays := time.Now().AddDate(0, 0, 7)
 
 	var movies []models.Movie
 
@@ -559,7 +560,7 @@ func (m *MovieDB) GetNowPlayingMovies(longitude, latitude int32) ([]models.Movie
 		err := m.DB.Conn.
 			Joins("JOIN movie_time_slots mts ON mts.movie_id = movies.id").
 			Where("movies.release_date <= ? OR movies.release_date < ?", today, todayMidNight).
-			Where("DATE(mts.date) <= ?", today).
+			Where("DATE(mts.date) >= ? AND DATE(mts.date) <= ?", today, afterSevenDays).
 			Preload("CastCrew").
 			Group("movies.id").
 			Find(&movies).Error
@@ -907,87 +908,52 @@ func (m *MovieDB) DeleteMovieTimeSlot(movieTimeSlotID uint) (int, error) {
 }
 
 func (m *MovieDB) AddMovieTimeSlot(movieTimeSlot models.MovieTimeSlot) (models.MovieTimeSlot, int, error) {
-
-	// All the changes made here need to be a part of a transaction
-
-	// Start transaction
-
 	tx := m.DB.Conn.Begin()
-
 	if tx.Error != nil {
 		return movieTimeSlot, 500, tx.Error
 	}
-	fmt.Println("calling AddMovieTimeSlot in moviedb.go file")
 
-	err := validate.Struct(movieTimeSlot)
-	if err != nil {
+	if err := validate.Struct(movieTimeSlot); err != nil {
+		tx.Rollback()
 		return movieTimeSlot, 400, err
 	}
 
-	// result := m.DB.Conn.Create(&movieTimeSlot)
-
 	result := tx.Clauses(clause.OnConflict{DoNothing: true}).Create(&movieTimeSlot)
 
-	if result.Error != nil && result.Error.Error() == "ERROR: duplicate key value violates unique constraint \"uniq_movie_time_slots\" (SQLSTATE 23505)" {
-		tx.Rollback()
-		return movieTimeSlot, 400, errors.New("ERROR: duplicate key value violates unique constraint \"uniq_movie_time_slots\" (SQLSTATE 23505)")
-	}
-
 	if result.Error != nil {
+		tx.Rollback()
 		return movieTimeSlot, 500, result.Error
 	}
 
-	// When a time slot is created, take the venue ID and fetch it's seat matrix and then add booked seats with corresponding seat matrix ID and movie slot ID
+	if result.RowsAffected == 0 {
+		tx.Rollback()
+		return movieTimeSlot, 409, errors.New("movie time slot already exists")
+	}
 
 	var seatMatrix []models.SeatMatrix
-
-	result = m.DB.Conn.Where("venue_id = ?", movieTimeSlot.VenueID).Find(&seatMatrix)
-
-	if result.Error != nil {
-		fmt.Println("error finding seat matrix of a particular venue")
-		return movieTimeSlot, 500, result.Error
+	if err := tx.Where("venue_id = ?", movieTimeSlot.VenueID).Find(&seatMatrix).Error; err != nil {
+		tx.Rollback()
+		return movieTimeSlot, 500, err
 	}
 
-	var bookedSeats []models.BookedSeats
-
+	bookedSeats := make([]models.BookedSeats, 0, len(seatMatrix))
 	for _, seat := range seatMatrix {
-		bookedSeat := models.BookedSeats{
+		bookedSeats = append(bookedSeats, models.BookedSeats{
 			SeatNumber:      seat.SeatNumber,
 			MovieTimeSlotID: movieTimeSlot.ID,
 			SeatMatrixID:    seat.ID,
 			IsBooked:        false,
-		}
-		bookedSeats = append(bookedSeats, bookedSeat)
+		})
 	}
 
-	// result = m.DB.Conn.Create(&bookedSeats)
-
-	result = tx.Clauses(clause.OnConflict{DoNothing: true}).Create(&bookedSeats)
-
-	if result.Error != nil && result.Error.Error() == "ERROR: duplicate key value violates unique constraint \"idx_unique_seat\" (SQLSTATE 23505)" {
-		return movieTimeSlot, 400, errors.New("ERROR: duplicate key value violates unique constraint \"idx_unique_seat\" (SQLSTATE 23505)")
+	if err := tx.Create(&bookedSeats).Error; err != nil {
+		tx.Rollback()
+		return movieTimeSlot, 500, err
 	}
-
-	if result.Error != nil && result.Error.Error() == "ERROR: duplicate key value violates unique constraint \"uni_seat_matrices_seat_number\" (SQLSTATE 23505)" {
-		return movieTimeSlot, 400, errors.New("duplicate seat number found")
-	}
-
-	if result.Error != nil {
-		return movieTimeSlot, 500, result.Error
-	}
-
-	// Commit the transaction
 
 	if err := tx.Commit().Error; err != nil {
-		return movieTimeSlot, 500, fmt.Errorf("commit error: %v", err)
+		return movieTimeSlot, 500, err
 	}
-
-	go func() {
-		err := recover()
-		if err != nil {
-			fmt.Println("Recovered in f", err)
-		}
-	}()
 
 	return movieTimeSlot, 200, nil
 }
