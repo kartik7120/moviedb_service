@@ -1306,7 +1306,7 @@ func (m *MoviedbService) BookSeats(ctx context.Context, in *moviedb.BookSeatsReq
 		seats = append(seats, seat)
 	}
 
-	status, err := m.MovieDB.BookSeats(in.MovieTimeSlotId, in.Email, in.PhoneNumber, seats)
+	bookedSeatsArr, status, err := m.MovieDB.BookSeats(in.MovieTimeSlotId, in.Email, in.PhoneNumber, seats)
 
 	if status != 200 || err != nil {
 
@@ -1320,9 +1320,10 @@ func (m *MoviedbService) BookSeats(ctx context.Context, in *moviedb.BookSeatsReq
 	}
 
 	return &moviedb.BookSeatsResponse{
-		Status:  200,
-		Message: "seats booked successfully",
-		Error:   "",
+		Status:      200,
+		Message:     "seats booked successfully",
+		Error:       "",
+		BookSeatsId: bookedSeatsArr,
 	}, nil
 }
 
@@ -1489,7 +1490,7 @@ func (m *MoviedbService) LockBookedSeats(ctx context.Context, in *moviedb.GetBoo
 
 func (m *MoviedbService) CreateTicket(ctx context.Context, in *moviedb.CreateTicketRequest) (*moviedb.CreateTicketResponse, error) {
 
-	ticketID, status, err := m.MovieDB.CreateTicket(in.IdempotentKey, in.TrasactionId)
+	ticketID, status, err := m.MovieDB.CreateTicket(in.IdempotentKey, in.TrasactionId, in.BookedSeatsIds)
 
 	if err != nil || status != 200 {
 		return &moviedb.CreateTicketResponse{
