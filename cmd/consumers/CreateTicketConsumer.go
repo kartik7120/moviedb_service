@@ -30,9 +30,9 @@ func NewConsumer(c *amqp091.Channel) Consumer {
 	}
 }
 
-func (c *Consumer) Send_Mail_Consumer() error {
+func (c *Consumer) Send_Mail_Consumer(rabbitmq_url string) error {
 
-	conn, err := helper.ConnectRabbitMQ("amqp://guest:guest@rabbitmq_booking_app:5672/", 5, 3*time.Second)
+	conn, err := helper.ConnectRabbitMQ(rabbitmq_url, 5, 3*time.Second)
 
 	if err != nil {
 		log.Error("error connecting to to rabbitmq in send mail consumer", err.Error())

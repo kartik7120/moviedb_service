@@ -94,22 +94,27 @@ type Movie struct {
 // Venue model
 type Venue struct {
 	gorm.Model
-	Name                 string         `json:"name" gorm:"not null"`
-	Type                 string         `json:"type" gorm:"not null"`
-	Address              string         `json:"address" gorm:"not null"`
-	Rows                 int            `json:"rows" gorm:"not null"`
-	Columns              int            `json:"columns" gorm:"not null"`
-	ScreenNumber         int            `json:"screen_number" gorm:"not null;unique"`
-	Longitude            float64        `json:"longitude" gorm:"not null"`
-	Latitude             float64        `json:"latitude" gorm:"not null"`
+
+	Name    string `json:"name" gorm:"not null;uniqueIndex:idx_name_address_screen,priority:1"`
+	Address string `json:"address" gorm:"not null;uniqueIndex:idx_name_address_screen,priority:2"`
+
+	CinemaName   string `json:"cinema_name" gorm:"not null;uniqueIndex:idx_cinema_screen,priority:1"`
+	ScreenNumber int    `json:"screen_number" gorm:"not null;uniqueIndex:idx_cinema_screen,priority:2;uniqueIndex:idx_name_address_screen,priority:3"`
+
+	Type    string `json:"type" gorm:"not null"`
+	Rows    int    `json:"rows" gorm:"not null"`
+	Columns int    `json:"columns" gorm:"not null"`
+
+	Latitude  float64 `json:"latitude" gorm:"not null"`
+	Longitude float64 `json:"longitude" gorm:"not null"`
+
 	MovieFormatSupported pq.StringArray `json:"movie_format_supported" gorm:"type:text[];not null"`
 	LanguagesSupported   pq.StringArray `json:"languages_supported" gorm:"type:text[];not null"`
 
 	// Relationships
-	Seats          []SeatMatrix    `json:"seats" gorm:"foreignKey:VenueID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	MovieTimeSlots []MovieTimeSlot `json:"movie_time_slots" gorm:"foreignKey:VenueID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	Movies         []Movie         `json:"movies" gorm:"many2many:movie_venues;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	CinemaName     string          `json:"cinema_name" gorm:"type:text;default:null"`
+	Seats          []SeatMatrix    `gorm:"foreignKey:VenueID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	MovieTimeSlots []MovieTimeSlot `gorm:"foreignKey:VenueID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Movies         []Movie         `gorm:"many2many:movie_venues;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
 type User struct {

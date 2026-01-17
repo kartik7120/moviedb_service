@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -16,6 +17,8 @@ type DBConfig struct {
 func ConnectToDB() (*gorm.DB, error) {
 	var count int64
 	dsn := os.Getenv("DSN")
+
+	fmt.Println("value of DSN : ", dsn)
 
 	for {
 		// conn, err := openDB(dsn)

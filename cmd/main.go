@@ -18,7 +18,19 @@ import (
 )
 
 func main() {
-	err := godotenv.Load()
+
+	env := os.Getenv("ENV")
+
+	rabbitmq_url := os.Getenv("RABBITMQ_URL")
+
+	if env == "TEST" {
+		err := godotenv.Load()
+
+		if err != nil {
+			log.Error("Error loading .env file")
+			// panic(err)
+		}
+	}
 
 	log.SetOutput(os.Stdout)
 	log.SetReportCaller(true)
@@ -29,12 +41,14 @@ func main() {
 		log.SetLevel(log.DebugLevel)
 	}
 
-	if err != nil {
-		log.Error("Error loading .env file")
-		// panic(err)
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "1102" // local fallback
 	}
 
-	lis, err := net.Listen("tcp", ":1102")
+	lis, err := net.Listen("tcp", "0.0.0.0:"+port)
+
+	// lis, err := net.Listen("tcp", ":1102")
 
 	if err != nil {
 		log.Error("error starting the server")
@@ -58,8 +72,12 @@ func main() {
 		log.Error("Error connecting to database")
 		panic(err)
 	}
+	// amqp://<username>:<password>@rabbitmq-4-management-siig.onrender.com:5672/<vhost>
 
-	conn, err := helper.ConnectRabbitMQ("amqp://guest:guest@rabbitmq_booking_app:5672/", 5, 3*time.Second)
+	// rabbitmq_connection_url := fmt.Sprintf("amqp://guest:guest@%s:5672/", rabbitmq_url)
+
+	conn, err := helper.ConnectRabbitMQ(rabbitmq_url, 5, 3*time.Second)
+	// conn, err := helper.ConnectRabbitMQ("amqp://guest:guest@rabbitmq_booking_app:5672/", 5, 3*time.Second)
 
 	if err != nil {
 		log.Error("error connecting to to rabbitmq", err.Error())
@@ -82,7 +100,7 @@ func main() {
 
 	go func() {
 		log.Info("Listening on incoming message from Send_Mail_Consumer")
-		err := consumer.Send_Mail_Consumer()
+		err := consumer.Send_Mail_Consumer(rabbitmq_url)
 		if err != nil {
 			log.Error("failed to consume send mail messages : ", err.Error())
 			os.Exit(1)

@@ -696,7 +696,7 @@ func TestMovieDB(t *testing.T) {
 		// 	{Row: 2, Column: 2, Price: 900, SeatNumber: "B2", Type: "Silver"},
 		// })
 
-		releaseDate := time.Now().UTC() // today’s date
+		releaseDate := time.Now().UTC().Add(time.Hour * 24 * 90) // 1 day ago
 
 		// movie := models.Movie{
 		// 	Title:           "The Batman",
@@ -744,54 +744,54 @@ func TestMovieDB(t *testing.T) {
 		// 	},
 		// }
 
-		movie := models.Movie{
-			Title:       "Harry Potter and the Goblet of Fire",
-			Description: "Harry Potter finds himself competing in the dangerous Triwizard Tournament between three wizarding schools, while a dark force begins to rise once more.",
-			ReleaseDate: releaseDate,                                                                           // 2005-11-18
-			PosterURL:   "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/fECBtHlr0RB3foNHDiCBXeg9Bv9.jpg", // official poster
-			Duration:    157,                                                                                   // minutes
-			Language:    pq.StringArray([]string{"English"}),
-			Type:        pq.StringArray([]string{"Adventure", "Fantasy", "Family"}),
-			MovieResolution: pq.StringArray([]string{
-				"4K", "IMAX", "1080p",
-			}),
-			CastCrew: []models.CastAndCrew{
-				{Type: "Cast", Name: "Daniel Radcliffe", Character: "Harry Potter", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/iPg0J9UzAlPj1fLEJNllpW9IhGe.jpg"},
-				{Type: "Cast", Name: "Emma Watson", Character: "Hermione Granger", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/9f5A6R8JcV5Y1GZ6wq9CkJ3xHkA.jpg"},
-				{Type: "Cast", Name: "Rupert Grint", Character: "Ron Weasley", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/6v7kFq8jZk5y0t3V2m9L4ZCwzYH.jpg"},
-				{Type: "Cast", Name: "Ralph Fiennes", Character: "Lord Voldemort", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/4WwC8nX7H2Yj8sZ6T5f5Zz7FZzU.jpg"},
-				{Type: "Crew", Name: "Mike Newell", Character: "Director", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/9h9K3YkJp0y5R0S3wJ8D3sZ1E5R.jpg"},
-			},
-			TrailerURL: "https://www.youtube.com/watch?v=3EGojp4Hh6I", // official trailer
-			Ranking:    8,
-			Votes:      7200,
-			Venues: []models.Venue{
-				{
-					Name:                 "Hogwarts Grand Theatre",
-					Type:                 "IMAX",
-					Address:              "Hogsmeade Village, Scotland",
-					Latitude:             57.1500,
-					Longitude:            -2.1100,
-					Rows:                 24,
-					Columns:              38,
-					ScreenNumber:         4,
-					MovieFormatSupported: pq.StringArray([]string{"IMAX", "4K", "Dolby Atmos"}),
-					LanguagesSupported:   pq.StringArray([]string{"English"}),
-				},
-				{
-					Name:                 "Wizarding World Multiplex",
-					Type:                 "Digital",
-					Address:              "Diagon Alley, London",
-					Latitude:             51.5155,
-					Longitude:            -0.0922,
-					Rows:                 18,
-					Columns:              28,
-					ScreenNumber:         6,
-					MovieFormatSupported: pq.StringArray([]string{"Digital", "3D"}),
-					LanguagesSupported:   pq.StringArray([]string{"English"}),
-				},
-			},
-		}
+		// movie := models.Movie{
+		// 	Title:       "Harry Potter and the Goblet of Fire",
+		// 	Description: "Harry Potter finds himself competing in the dangerous Triwizard Tournament between three wizarding schools, while a dark force begins to rise once more.",
+		// 	ReleaseDate: releaseDate,                                                                           // 2005-11-18
+		// 	PosterURL:   "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/fECBtHlr0RB3foNHDiCBXeg9Bv9.jpg", // official poster
+		// 	Duration:    157,                                                                                   // minutes
+		// 	Language:    pq.StringArray([]string{"English"}),
+		// 	Type:        pq.StringArray([]string{"Adventure", "Fantasy", "Family"}),
+		// 	MovieResolution: pq.StringArray([]string{
+		// 		"4K", "IMAX", "1080p",
+		// 	}),
+		// 	CastCrew: []models.CastAndCrew{
+		// 		{Type: "Cast", Name: "Daniel Radcliffe", Character: "Harry Potter", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/iPg0J9UzAlPj1fLEJNllpW9IhGe.jpg"},
+		// 		{Type: "Cast", Name: "Emma Watson", Character: "Hermione Granger", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/9f5A6R8JcV5Y1GZ6wq9CkJ3xHkA.jpg"},
+		// 		{Type: "Cast", Name: "Rupert Grint", Character: "Ron Weasley", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/6v7kFq8jZk5y0t3V2m9L4ZCwzYH.jpg"},
+		// 		{Type: "Cast", Name: "Ralph Fiennes", Character: "Lord Voldemort", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/4WwC8nX7H2Yj8sZ6T5f5Zz7FZzU.jpg"},
+		// 		{Type: "Crew", Name: "Mike Newell", Character: "Director", PhotoURL: "https://www.themoviedb.org/t/p/w300_and_h450_bestv2/9h9K3YkJp0y5R0S3wJ8D3sZ1E5R.jpg"},
+		// 	},
+		// 	TrailerURL: "https://www.youtube.com/watch?v=3EGojp4Hh6I", // official trailer
+		// 	Ranking:    8,
+		// 	Votes:      7200,
+		// 	Venues: []models.Venue{
+		// 		{
+		// 			Name:                 "Hogwarts Grand Theatre",
+		// 			Type:                 "IMAX",
+		// 			Address:              "Hogsmeade Village, Scotland",
+		// 			Latitude:             57.1500,
+		// 			Longitude:            -2.1100,
+		// 			Rows:                 24,
+		// 			Columns:              38,
+		// 			ScreenNumber:         4,
+		// 			MovieFormatSupported: pq.StringArray([]string{"IMAX", "4K", "Dolby Atmos"}),
+		// 			LanguagesSupported:   pq.StringArray([]string{"English"}),
+		// 		},
+		// 		{
+		// 			Name:                 "Wizarding World Multiplex",
+		// 			Type:                 "Digital",
+		// 			Address:              "Diagon Alley, London",
+		// 			Latitude:             51.5155,
+		// 			Longitude:            -0.0922,
+		// 			Rows:                 18,
+		// 			Columns:              28,
+		// 			ScreenNumber:         6,
+		// 			MovieFormatSupported: pq.StringArray([]string{"Digital", "3D"}),
+		// 			LanguagesSupported:   pq.StringArray([]string{"English"}),
+		// 		},
+		// 	},
+		// }
 
 		// // Create timeslots
 		// st1 := time.Date(releaseDate.Year(), releaseDate.Month(), releaseDate.Day(), 18, 30, 0, 0, time.UTC)
@@ -957,6 +957,208 @@ func TestMovieDB(t *testing.T) {
 		// 		},
 		// 	},
 		// }
+
+		// movie := models.Movie{
+		// 	Title:           "Harry Potter and the Order of the Phoenix",
+		// 	Description:     "In his fifth year at Hogwarts, Harry Potter discovers that much of the wizarding world denies the truth of his encounter with Voldemort. As the Ministry interferes at Hogwarts, Harry forms Dumbledore’s Army to prepare for the dark times ahead.",
+		// 	ReleaseDate:     releaseDate, // 2007-07-11
+		// 	PosterURL:       "https://image.tmdb.org/t/p/w600_and_h900_bestv2/5aOyriWkPec0zUDxmHFP9qMmBaj.jpg",
+		// 	Duration:        138, // minutes
+		// 	Language:        pq.StringArray([]string{"English"}),
+		// 	Type:            pq.StringArray([]string{"Fantasy", "Adventure", "Action"}),
+		// 	MovieResolution: pq.StringArray([]string{"2D", "4K", "IMAX"}),
+
+		// 	CastCrew: []models.CastAndCrew{
+		// 		{Type: "Cast", Name: "Daniel Radcliffe", Character: "Harry Potter", PhotoURL: "https://image.tmdb.org/t/p/w300_and_h450_bestv2/iPg0J9UzAlPj1fLEJNllpW9IhGe.jpg"},
+		// 		{Type: "Cast", Name: "Emma Watson", Character: "Hermione Granger", PhotoURL: "https://image.tmdb.org/t/p/w300_and_h450_bestv2/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg"},
+		// 		{Type: "Cast", Name: "Rupert Grint", Character: "Ron Weasley", PhotoURL: "https://image.tmdb.org/t/p/w300_and_h450_bestv2/6O9tV4o5P2Wwsh9HbYc9wZKcF6X.jpg"},
+		// 		{Type: "Cast", Name: "Imelda Staunton", Character: "Dolores Umbridge", PhotoURL: "https://image.tmdb.org/t/p/w300_and_h450_bestv2/pnK2ZrjZLwZrF3RrgPf63HgNbUs.jpg"},
+		// 		{Type: "Crew", Name: "David Yates", Character: "Director", PhotoURL: "https://image.tmdb.org/t/p/w300_and_h450_bestv2/5YHtrmP0cO9l1kK1fskv6jVJHjG.jpg"},
+		// 	},
+
+		// 	Ranking: 8,
+		// 	Votes:   980000,
+
+		// 	Venues: []models.Venue{
+		// 		{
+		// 			Name:                 "Hogwarts Grand Screen",
+		// 			Type:                 "IMAX",
+		// 			Address:              "Platform 9¾, Wizarding City",
+		// 			Latitude:             51.5074,
+		// 			Longitude:            -0.1278,
+		// 			Rows:                 28,
+		// 			Columns:              40,
+		// 			ScreenNumber:         9,
+		// 			MovieFormatSupported: pq.StringArray([]string{"IMAX", "4K"}),
+		// 			LanguagesSupported:   pq.StringArray([]string{"English"}),
+		// 		},
+		// 		{
+		// 			Name:                 "Ministry Cinema Hall",
+		// 			Type:                 "Digital",
+		// 			Address:              "Whitehall, London",
+		// 			Latitude:             51.5033,
+		// 			Longitude:            -0.1195,
+		// 			Rows:                 24,
+		// 			Columns:              36,
+		// 			ScreenNumber:         10,
+		// 			MovieFormatSupported: pq.StringArray([]string{"Digital", "Dolby Atmos"}),
+		// 			LanguagesSupported:   pq.StringArray([]string{"English"}),
+		// 		},
+		// 	},
+		// }
+
+		// movie := models.Movie{
+		// 	Title:       "Harry Potter and the Order of the Phoenix",
+		// 	Description: "In his fifth year at Hogwarts, Harry Potter discovers that much of the wizarding world denies the truth of his encounter with Voldemort. As the Ministry interferes at Hogwarts, Harry forms Dumbledore’s Army to prepare for the dark times ahead.",
+		// 	ReleaseDate: releaseDate.Add(-time.Hour * 24 * 3),
+		// 	PosterURL:   "https://image.tmdb.org/t/p/w600_and_h900_bestv2/5aOyriWkPec0zUDxmHFP9qMmBaj.jpg",
+		// 	Duration:    138, // minutes
+		// 	Language:    pq.StringArray([]string{"English"}),
+		// 	Type:        pq.StringArray([]string{"Fantasy", "Adventure", "Action"}),
+		// 	MovieResolution: pq.StringArray([]string{
+		// 		"2D", "4K", "IMAX",
+		// 	}),
+
+		// 	CastCrew: []models.CastAndCrew{
+		// 		{Type: "Cast", Name: "Daniel Radcliffe", Character: "Harry Potter", PhotoURL: "https://image.tmdb.org/t/p/w300_and_h450_bestv2/iPg0J9UzAlPj1fLEJNllpW9IhGe.jpg"},
+		// 		{Type: "Cast", Name: "Emma Watson", Character: "Hermione Granger", PhotoURL: "https://image.tmdb.org/t/p/w300_and_h450_bestv2/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg"},
+		// 		{Type: "Cast", Name: "Rupert Grint", Character: "Ron Weasley", PhotoURL: "https://image.tmdb.org/t/p/w300_and_h450_bestv2/6O9tV4o5P2Wwsh9HbYc9wZKcF6X.jpg"},
+		// 		{Type: "Cast", Name: "Imelda Staunton", Character: "Dolores Umbridge", PhotoURL: "https://image.tmdb.org/t/p/w300_and_h450_bestv2/pnK2ZrjZLwZrF3RrgPf63HgNbUs.jpg"},
+		// 		{Type: "Crew", Name: "David Yates", Character: "Director", PhotoURL: "https://image.tmdb.org/t/p/w300_and_h450_bestv2/5YHtrmP0cO9l1kK1fskv6jVJHjG.jpg"},
+		// 	},
+
+		// 	Ranking: 8,
+		// 	Votes:   980000,
+
+		// 	Venues: []models.Venue{
+		// 		{
+		// 			Name:                 "Hogwarts Grand Screen",
+		// 			Type:                 "IMAX",
+		// 			Address:              "Platform 9¾, Wizarding City",
+		// 			Latitude:             51.5074,
+		// 			Longitude:            -0.1278,
+		// 			Rows:                 28,
+		// 			Columns:              40,
+		// 			ScreenNumber:         9,
+		// 			MovieFormatSupported: pq.StringArray([]string{"IMAX", "4K"}),
+		// 			LanguagesSupported:   pq.StringArray([]string{"English"}),
+		// 		},
+		// 		{
+		// 			Name:                 "Ministry Cinema Hall",
+		// 			Type:                 "Digital",
+		// 			Address:              "Whitehall, London",
+		// 			Latitude:             51.5033,
+		// 			Longitude:            -0.1195,
+		// 			Rows:                 24,
+		// 			Columns:              36,
+		// 			ScreenNumber:         10,
+		// 			MovieFormatSupported: pq.StringArray([]string{"Digital", "Dolby Atmos"}),
+		// 			LanguagesSupported:   pq.StringArray([]string{"English"}),
+		// 		},
+		// 	},
+		// }
+
+		// movie := models.Movie{
+		// 	Title:       "Harry Potter and the Philosopher’s Stone",
+		// 	Description: "Harry Potter discovers on his eleventh birthday that he is the orphaned son of two powerful wizards and possesses unique magical powers. Invited to attend Hogwarts School of Witchcraft and Wizardry, Harry embarks on an extraordinary journey that will change his life forever.",
+		// 	ReleaseDate: releaseDate.Add(-time.Hour * 24 * 2160), // ~2001-11-16 (relative offset)
+		// 	PosterURL:   "https://image.tmdb.org/t/p/w600_and_h900_bestv2/wuMc08IPKEatf9rnMNXvIDxqP4W.jpg",
+		// 	Duration:    152, // minutes
+		// 	Language:    pq.StringArray([]string{"English"}),
+		// 	Type:        pq.StringArray([]string{"Fantasy", "Adventure", "Family"}),
+		// 	MovieResolution: pq.StringArray([]string{
+		// 		"2D", "4K", "IMAX",
+		// 	}),
+
+		// 	CastCrew: []models.CastAndCrew{
+		// 		{Type: "Cast", Name: "Daniel Radcliffe", Character: "Harry Potter", PhotoURL: "https://image.tmdb.org/t/p/w300_and_h450_bestv2/iPg0J9UzAlPj1fLEJNllpW9IhGe.jpg"},
+		// 		{Type: "Cast", Name: "Emma Watson", Character: "Hermione Granger", PhotoURL: "https://image.tmdb.org/t/p/w300_and_h450_bestv2/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg"},
+		// 		{Type: "Cast", Name: "Rupert Grint", Character: "Ron Weasley", PhotoURL: "https://image.tmdb.org/t/p/w300_and_h450_bestv2/6O9tV4o5P2Wwsh9HbYc9wZKcF6X.jpg"},
+		// 		{Type: "Cast", Name: "Richard Harris", Character: "Albus Dumbledore", PhotoURL: "https://image.tmdb.org/t/p/w300_and_h450_bestv2/6a1fZ6uR9Y8aAizI0s5momkGLum.jpg"},
+		// 		{Type: "Crew", Name: "Chris Columbus", Character: "Director", PhotoURL: "https://image.tmdb.org/t/p/w300_and_h450_bestv2/zf0R9L9PjzjZQzQpimeISFRCGDy.jpg"},
+		// 	},
+
+		// 	Ranking: 8,
+		// 	Votes:   820000,
+
+		// 	Venues: []models.Venue{
+		// 		{
+		// 			Name:                 "Hogwarts Grand Screen",
+		// 			Type:                 "IMAX",
+		// 			Address:              "Platform 9¾, Wizarding City",
+		// 			Latitude:             51.5074,
+		// 			Longitude:            -0.1278,
+		// 			Rows:                 28,
+		// 			Columns:              40,
+		// 			ScreenNumber:         1,
+		// 			MovieFormatSupported: pq.StringArray([]string{"IMAX", "4K"}),
+		// 			LanguagesSupported:   pq.StringArray([]string{"English"}),
+		// 		},
+		// 		{
+		// 			Name:                 "Diagon Alley Cinema",
+		// 			Type:                 "Digital",
+		// 			Address:              "Charing Cross Road, London",
+		// 			Latitude:             51.5142,
+		// 			Longitude:            -0.1293,
+		// 			Rows:                 22,
+		// 			Columns:              34,
+		// 			ScreenNumber:         2,
+		// 			MovieFormatSupported: pq.StringArray([]string{"Digital", "Dolby Atmos"}),
+		// 			LanguagesSupported:   pq.StringArray([]string{"English"}),
+		// 		},
+		// 	},
+		// }
+
+		movie := models.Movie{
+			Title:       "Harry Potter and the Deathly Hallows – Part 1",
+			Description: "As Voldemort’s power grows stronger, Harry, Ron, and Hermione leave Hogwarts behind and embark on a dangerous mission to destroy the Horcruxes. On the run and without guidance, their friendship and courage are tested as the wizarding world falls into darkness.",
+			ReleaseDate: releaseDate, // ~2010-11-19 (relative offset)
+			PosterURL:   "https://image.tmdb.org/t/p/w600_and_h900_bestv2/iGoXIpQb7Pot00EEdwpwPajheZ5.jpg",
+			Duration:    146, // minutes
+			Language:    pq.StringArray([]string{"English"}),
+			Type:        pq.StringArray([]string{"Fantasy", "Adventure", "Drama"}),
+			MovieResolution: pq.StringArray([]string{
+				"2D", "4K", "IMAX",
+			}),
+
+			CastCrew: []models.CastAndCrew{
+				{Type: "Cast", Name: "Daniel Radcliffe", Character: "Harry Potter", PhotoURL: "https://image.tmdb.org/t/p/w300_and_h450_bestv2/iPg0J9UzAlPj1fLEJNllpW9IhGe.jpg"},
+				{Type: "Cast", Name: "Emma Watson", Character: "Hermione Granger", PhotoURL: "https://image.tmdb.org/t/p/w300_and_h450_bestv2/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg"},
+				{Type: "Cast", Name: "Rupert Grint", Character: "Ron Weasley", PhotoURL: "https://image.tmdb.org/t/p/w300_and_h450_bestv2/6O9tV4o5P2Wwsh9HbYc9wZKcF6X.jpg"},
+				{Type: "Cast", Name: "Ralph Fiennes", Character: "Lord Voldemort", PhotoURL: "https://image.tmdb.org/t/p/w300_and_h450_bestv2/9p0wF6b9Z2zDg0Z3zD9P5z0ZK8y.jpg"},
+				{Type: "Crew", Name: "David Yates", Character: "Director", PhotoURL: "https://image.tmdb.org/t/p/w300_and_h450_bestv2/5YHtrmP0cO9l1kK1fskv6jVJHjG.jpg"},
+			},
+
+			Ranking: 8,
+			Votes:   900000,
+
+			Venues: []models.Venue{
+				{
+					Name:                 "Hogwarts Grand Screen",
+					Type:                 "IMAX",
+					Address:              "Platform 9¾, Wizarding City",
+					Latitude:             51.5074,
+					Longitude:            -0.1278,
+					Rows:                 30,
+					Columns:              42,
+					ScreenNumber:         11,
+					MovieFormatSupported: pq.StringArray([]string{"IMAX", "4K"}),
+					LanguagesSupported:   pq.StringArray([]string{"English"}),
+				},
+				{
+					Name:                 "Godric’s Hollow Cinema",
+					Type:                 "Digital",
+					Address:              "Godric’s Hollow, England",
+					Latitude:             51.7361,
+					Longitude:            -1.2428,
+					Rows:                 26,
+					Columns:              38,
+					ScreenNumber:         12,
+					MovieFormatSupported: pq.StringArray([]string{"Digital", "Dolby Atmos"}),
+					LanguagesSupported:   pq.StringArray([]string{"English"}),
+				},
+			},
+		}
 
 		// Time slots: today + tomorrow
 		st1 := time.Date(releaseDate.Year(), releaseDate.Month(), releaseDate.Day(), 19, 0, 0, 0, time.UTC)
@@ -1248,34 +1450,30 @@ func TestMovieDB(t *testing.T) {
 				StartTime:   st1,
 				EndTime:     et1,
 				Duration:    int(et1.Sub(st1).Minutes()),
-				Date:        releaseDate.AddDate(0, 0, 5),
+				Date:        releaseDate.AddDate(0, 0, 2),
 				MovieFormat: "IMAX",
-				MovieID:     61,
+				MovieID:     68,
 				VenueID:     5,
 			},
 			{
 				StartTime:   st2,
 				EndTime:     et2,
 				Duration:    int(et2.Sub(st2).Minutes()),
-				Date:        releaseDate.AddDate(0, 1, 2), // tomorrow
+				Date:        releaseDate.AddDate(0, 0, 3), // tomorrow
 				MovieFormat: "Digital",
-				MovieID:     61,
+				MovieID:     68,
 				VenueID:     5,
 			},
 			{
 				StartTime:   st2,
 				EndTime:     et2,
 				Duration:    int(et2.Sub(st2).Minutes()),
-				Date:        releaseDate.AddDate(1, 1, 2), // tomorrow
+				Date:        releaseDate.AddDate(0, 0, 4), // tomorrow
 				MovieFormat: "Digital",
-				MovieID:     61,
+				MovieID:     68,
 				VenueID:     5,
 			},
 		}
-
-		// result := m.DB.Conn.Model(models.MovieTimeSlot{}).Create(timeSlots)
-
-		// Need to use addmovie time slot method to properly create time slot and corressponding booked seats
 
 		for _, v := range timeSlots {
 
@@ -1291,12 +1489,6 @@ func TestMovieDB(t *testing.T) {
 				return
 			}
 		}
-
-		// if result.Error != nil {
-		// 	t.Error(result.Error)
-		// 	return
-		// }
-
 	})
 
 	t.Run("Add venue along side movies in database", func(t *testing.T) {
@@ -1519,7 +1711,9 @@ func TestMovieDB(t *testing.T) {
 
 		// m.DB.Conn.AutoMigrate(&models.BookedSeats{}, &models.MovieTimeSlot{}, &models.CastAndCrew{}, &models.Review{}, &models.Venue{}, &models.SeatMatrix{}, &models.Movie{}, &models.User{}, &models.Idempotent{}, &models.CastAndCrew{}, &models.Review{}, &models.Ticket{}, &models.User{})
 
-		err = m.DB.Conn.AutoMigrate(&models.SeatMatrix{})
+		// err = m.DB.Conn.AutoMigrate(&models.Venue{})
+		err = m.DB.Conn.Migrator().DropConstraint(&models.Venue{}, "uni_venues_screen_number")
+
 		// m.DB.Conn.AutoMigrate(&models.Ticket{})
 
 		if err != nil {

@@ -614,7 +614,7 @@ func (m *MovieDB) GetUpcomingMovies(date string) ([]models.Movie, int, error) {
 
 	// Calculate start and end dates
 	// startDate := d.AddDate(0, 0, 0)
-	endDate := d.AddDate(0, 7, 0)
+	endDate := d.AddDate(0, 0, 1)
 
 	// Query the database
 	var movies []models.Movie
